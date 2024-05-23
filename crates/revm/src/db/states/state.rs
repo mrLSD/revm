@@ -14,7 +14,7 @@ use std::{
 };
 
 /// Database boxed with a lifetime and Send.
-pub type DBBox<'a, E> = Box<dyn Database<Error = E> + Send + 'a>;
+pub type DBBox<'a, E> = Box<dyn Database<Error=E> + Send + 'a>;
 
 /// More constrained version of State that uses Boxed database with a lifetime.
 ///
@@ -83,7 +83,7 @@ impl<DB: Database> State<DB> {
     /// balances must be filtered out before calling this function.
     pub fn increment_balances(
         &mut self,
-        balances: impl IntoIterator<Item = (Address, u128)>,
+        balances: impl IntoIterator<Item=(Address, u128)>,
     ) -> Result<(), DB::Error> {
         // make transition and update cache state
         let mut transitions = Vec::new();
@@ -111,7 +111,7 @@ impl<DB: Database> State<DB> {
     /// It is used for DAO hardfork state change to move values from given accounts.
     pub fn drain_balances(
         &mut self,
-        addresses: impl IntoIterator<Item = Address>,
+        addresses: impl IntoIterator<Item=Address>,
     ) -> Result<Vec<u128>, DB::Error> {
         // make transition and update cache state
         let mut transitions = Vec::new();
@@ -538,14 +538,14 @@ mod tests {
                         slot1,
                         StorageSlot::new_changed(
                             *existing_account_initial_storage.get(&slot1).unwrap(),
-                            U256::from(1_000)
+                            U256::from(1_000),
                         )
                     ),
                     (
                         slot2,
                         StorageSlot::new_changed(
                             *existing_account_initial_storage.get(&slot2).unwrap(),
-                            U256::from(2_000)
+                            U256::from(2_000),
                         )
                     ),
                     // Create new slot

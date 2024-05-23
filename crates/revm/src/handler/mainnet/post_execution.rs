@@ -39,6 +39,10 @@ pub fn reward_beneficiary<SPEC: Spec, EXT, DB: Database>(
         .load_account(beneficiary, &mut context.evm.inner.db)?;
 
     coinbase_account.mark_touch();
+    // TODOFEE
+    println!("-> coinbase balance {beneficiary}: {} + {coinbase_gas_price} * ({} - {})= {} [coinbase_gas_price: {coinbase_gas_price}]", coinbase_account
+        .info
+        .balance, gas.spent(), gas.refunded(), coinbase_gas_price * U256::from(gas.spent() - gas.refunded() as u64));
     coinbase_account.info.balance = coinbase_account
         .info
         .balance
@@ -61,6 +65,11 @@ pub fn reimburse_caller<SPEC: Spec, EXT, DB: Database>(
         .inner
         .journaled_state
         .load_account(caller, &mut context.evm.inner.db)?;
+
+    // TODOFEE
+    println!("\n\n\t██████████ POST EXEC\n-> reimburs: {caller}: {} + {effective_gas_price} * ({} + {}) [= {}]", caller_account
+        .info
+        .balance, gas.remaining(), gas.refunded(), effective_gas_price * U256::from(gas.remaining() + gas.refunded() as u64));
 
     caller_account.info.balance = caller_account
         .info

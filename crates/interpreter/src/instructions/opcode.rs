@@ -119,10 +119,10 @@ pub fn make_boxed_instruction_table<'a, H, SPEC, FN>(
     table: InstructionTable<H>,
     mut outer: FN,
 ) -> BoxedInstructionTable<'a, H>
-where
-    H: Host,
-    SPEC: Spec + 'a,
-    FN: FnMut(Instruction<H>) -> BoxedInstruction<'a, H>,
+    where
+        H: Host,
+        SPEC: Spec + 'a,
+        FN: FnMut(Instruction<H>) -> BoxedInstruction<'a, H>,
 {
     core::array::from_fn(|i| outer(table[i]))
 }
@@ -445,7 +445,7 @@ impl fmt::Display for OpCode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let n = self.get();
         if let Some(val) = OPCODE_JUMPMAP[n as usize] {
-            f.write_str(val)
+            write!(f, "0x{n:02X} [{val}]")
         } else {
             write!(f, "UNKNOWN(0x{n:02X})")
         }

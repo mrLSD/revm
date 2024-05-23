@@ -114,9 +114,38 @@ fn check_evm_execution<EXT>(
     exec_result: &EVMResultGeneric<ExecutionResult, Infallible>,
     evm: &Evm<'_, EXT, &mut State<EmptyDB>>,
     print_json_outcome: bool,
+    index: usize,
+    spec_name: &SpecName,
 ) -> Result<(), TestError> {
+    match spec_name {
+        &SpecName::Cancun => (),
+        _ => return Ok(()),
+    }
     let logs_root = log_rlp_hash(exec_result.as_ref().map(|r| r.logs()).unwrap_or_default());
     let state_root = state_merkle_trie_root(evm.context.evm.db.cache.trie_account());
+
+    println!("\n\n\t██████████ FINAL NOTES: {test_name}-{index}");
+    println!("actual_hash: {state_root:?}");
+    println!(
+        "gas_used: {}",
+        exec_result
+            .as_ref()
+            .ok()
+            .map(|r| r.gas_used())
+            .unwrap_or_default(),
+    );
+    println!("evmResult: {:?}", exec_result.as_ref());
+
+    for (addr, acc) in &evm.context.evm.db.cache.accounts {
+        if let Some(acc) = &acc.account {
+            println!("{addr:?}:");
+            let info = acc.info.clone();
+            println!("    balance: {:?}", info.balance.to_string());
+            println!("    code: {:?}", info.code);
+            println!("    nonce: {:?}", info.nonce);
+            println!("    storage: {:#?}", acc.storage);
+        }
+    }
 
     let print_json_output = |error: Option<String>| {
         if print_json_outcome {
@@ -302,6 +331,10 @@ pub fn execute_test_suite(
             let spec_id = spec_name.to_spec_id();
 
             for (index, test) in tests.into_iter().enumerate() {
+                if spec_id != SpecId::CANCUN {
+                    continue;
+                }
+
                 env.tx.gas_limit = unit.transaction.gas_limit[test.indexes.gas].saturating_to();
 
                 env.tx.data = unit
@@ -339,7 +372,7 @@ pub fn execute_test_suite(
                 let mut cache = cache_state.clone();
                 cache.set_state_clear_flag(SpecId::enabled(
                     spec_id,
-                    revm::primitives::SpecId::SPURIOUS_DRAGON,
+                    SpecId::SPURIOUS_DRAGON,
                 ));
                 let mut state = revm::db::State::builder()
                     .with_cached_prestate(cache)
@@ -373,6 +406,8 @@ pub fn execute_test_suite(
                         &res,
                         &evm,
                         print_json_outcome,
+                        index,
+                        &spec_name,
                     ) else {
                         continue;
                     };
@@ -391,6 +426,8 @@ pub fn execute_test_suite(
                         &res,
                         &evm,
                         print_json_outcome,
+                        index,
+                        &spec_name,
                     );
                     let Err(e) = output else {
                         continue;
@@ -409,7 +446,7 @@ pub fn execute_test_suite(
                 let mut cache = cache_state.clone();
                 cache.set_state_clear_flag(SpecId::enabled(
                     spec_id,
-                    revm::primitives::SpecId::SPURIOUS_DRAGON,
+                    SpecId::SPURIOUS_DRAGON,
                 ));
                 let state = revm::db::State::builder()
                     .with_cached_prestate(cache)

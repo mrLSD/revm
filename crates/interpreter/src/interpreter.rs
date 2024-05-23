@@ -8,10 +8,7 @@ pub use contract::Contract;
 pub use shared_memory::{next_multiple_of_32, SharedMemory, EMPTY_SHARED_MEMORY};
 pub use stack::{Stack, STACK_LIMIT};
 
-use crate::{
-    primitives::Bytes, push, push_b256, return_ok, return_revert, CallInputs, CallOutcome,
-    CreateInputs, CreateOutcome, Gas, Host, InstructionResult,
-};
+use crate::{primitives::Bytes, push, push_b256, return_ok, return_revert, CallInputs, CallOutcome, CreateInputs, CreateOutcome, Gas, Host, InstructionResult, OpCode};
 use core::cmp::min;
 use revm_primitives::U256;
 use std::borrow::ToOwned;
@@ -284,12 +281,14 @@ impl Interpreter {
     /// Internally it will increment instruction pointer by one.
     #[inline(always)]
     fn step<FN, H: Host>(&mut self, instruction_table: &[FN; 256], host: &mut H)
-    where
-        FN: Fn(&mut Interpreter, &mut H),
+        where
+            FN: Fn(&mut Interpreter, &mut H),
     {
         // Get current opcode.
         let opcode = unsafe { *self.instruction_pointer };
-
+        let op = OpCode::new(opcode).unwrap();
+        // TODOFEE
+        println!("### {op}");
         // SAFETY: In analysis we are doing padding of bytecode so that we are sure that last
         // byte instruction is STOP so we are safe to just increment program_counter bcs on last instruction
         // it will do noop and just stop execution of this contract
@@ -311,8 +310,8 @@ impl Interpreter {
         instruction_table: &[FN; 256],
         host: &mut H,
     ) -> InterpreterAction
-    where
-        FN: Fn(&mut Interpreter, &mut H),
+        where
+            FN: Fn(&mut Interpreter, &mut H),
     {
         self.next_action = InterpreterAction::None;
         self.shared_memory = shared_memory;

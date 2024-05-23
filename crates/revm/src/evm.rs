@@ -31,10 +31,10 @@ pub struct Evm<'a, EXT, DB: Database> {
 }
 
 impl<EXT, DB> fmt::Debug for Evm<'_, EXT, DB>
-where
-    EXT: fmt::Debug,
-    DB: Database + fmt::Debug,
-    DB::Error: fmt::Debug,
+    where
+        EXT: fmt::Debug,
+        DB: Database + fmt::Debug,
+        DB::Error: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Evm")
@@ -242,17 +242,17 @@ impl<EXT, DB: Database> Evm<'_, EXT, DB> {
         instruction_table: &[FN; 256],
         first_frame: Frame,
     ) -> Result<FrameResult, EVMError<DB::Error>>
-    where
-        FN: Fn(&mut Interpreter, &mut Self),
+        where
+            FN: Fn(&mut Interpreter, &mut Self),
     {
         let mut call_stack: Vec<Frame> = Vec::with_capacity(1025);
         call_stack.push(first_frame);
 
         #[cfg(feature = "memory_limit")]
-        let mut shared_memory =
+            let mut shared_memory =
             SharedMemory::new_with_memory_limit(self.context.evm.env.cfg.memory_limit);
         #[cfg(not(feature = "memory_limit"))]
-        let mut shared_memory = SharedMemory::new();
+            let mut shared_memory = SharedMemory::new();
 
         shared_memory.new_context();
 
@@ -343,6 +343,8 @@ impl<EXT, DB: Database> Evm<'_, EXT, DB> {
         // deduce caller balance with its limit.
         pre_exec.deduct_caller(ctx)?;
 
+        // TODOFEE
+        println!("\t# initial_gas_spend: {initial_gas_spend}");
         let gas_limit = ctx.evm.env.tx.gas_limit - initial_gas_spend;
 
         let exec = self.handler.execution();

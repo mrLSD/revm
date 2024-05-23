@@ -25,7 +25,7 @@ pub struct Gas {
 impl Gas {
     /// Creates a new `Gas` struct with the given gas limit.
     #[inline]
-    pub const fn new(limit: u64) -> Self {
+    pub fn new(limit: u64) -> Self {
         Self {
             limit,
             remaining: limit,
@@ -55,14 +55,14 @@ impl Gas {
 
     /// Returns the total amount of gas spent.
     #[inline]
-    pub const fn spent(&self) -> u64 {
+    pub fn spent(&self) -> u64 {
         self.limit - self.remaining
     }
 
     #[doc(hidden)]
     #[inline]
     #[deprecated(note = "use `spent` instead")]
-    pub const fn spend(&self) -> u64 {
+    pub fn spend(&self) -> u64 {
         self.spent()
     }
 
@@ -102,6 +102,8 @@ impl Gas {
     /// Set a refund value. This overrides the current refund value.
     #[inline]
     pub fn set_refund(&mut self, refund: i64) {
+        // TODOFEE
+        println!("\tset_refund: {refund}");
         self.refunded = refund;
     }
 
@@ -117,6 +119,8 @@ impl Gas {
 
         self.remaining_nomem -= cost;
         self.remaining = remaining;
+        // TODOFEE
+        println!("\t# record_cost: {cost} [{} | {remaining}]", self.spent());
         true
     }
 
@@ -132,6 +136,8 @@ impl Gas {
             }
             self.memory = gas_memory;
             self.remaining = remaining;
+            // TODOFEE
+            println!("\t# record_memory: {gas_memory} [{} | {remaining}]", self.spent());
         }
         true
     }

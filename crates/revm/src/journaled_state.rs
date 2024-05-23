@@ -25,7 +25,8 @@ pub struct JournaledState {
     pub journal: Vec<Vec<JournalEntry>>,
     /// Ethereum before EIP-161 differently defined empty and not-existing account
     /// Spec is needed for two things SpuriousDragon's `EIP-161 State clear`,
-    /// and for Cancun's `EIP-6780: SELFDESTRUCT in same transaction`
+    /// and for Cancun's `EIP
+    /// -6780: SELFDESTRUCT in same transaction`
     pub spec: SpecId,
     /// Warm loaded addresses are used to check if loaded address
     /// should be considered cold or warm loaded when the account
@@ -203,6 +204,8 @@ impl JournaledState {
         *to_balance = to_balance_decr;
         // Overflow of U256 balance is not possible to happen on mainnet. We don't bother to return funds from from_acc.
 
+        // TODOFEE
+        println!("-> transfer: {from} -> {to} [{balance}]");
         self.journal
             .last_mut()
             .unwrap()
@@ -283,6 +286,9 @@ impl JournaledState {
             return Err(InstructionResult::OverflowPayment);
         };
         account.info.balance = new_balance;
+        // TODOFEE
+        println!("-> create_account: {address}: {new_balance}");
+
 
         // EIP-161: State trie clearing (invariant-preserving alternative)
         if spec_id.is_enabled_in(SPURIOUS_DRAGON) {
@@ -294,6 +300,8 @@ impl JournaledState {
         let caller_account = self.state.get_mut(&caller).unwrap();
         // Balance is already checked in `create_inner`, so it is safe to just subtract.
         caller_account.info.balance -= balance;
+        // TODOFEE
+        println!("-> create_account: caller {caller}: -{balance}");
 
         // add journal entry of transferred balance
         last_journal.push(JournalEntry::BalanceTransfer {
@@ -469,6 +477,8 @@ impl JournaledState {
 
             let target_account = self.state.get_mut(&target).unwrap();
             Self::touch_account(self.journal.last_mut().unwrap(), &target, target_account);
+            // TODOFEE
+            println!("-> selfdestruct: {address}: +{acc_balance}");
             target_account.info.balance += acc_balance;
         }
 

@@ -384,6 +384,5 @@ pub fn validate_initial_tx_gas<SPEC: Spec>(
     if SPEC::enabled(SHANGHAI) && is_create {
         initial_gas += initcode_cost(input.len() as u64)
     }
-
     initial_gas
 }

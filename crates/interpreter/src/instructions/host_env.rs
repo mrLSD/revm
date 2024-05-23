@@ -59,18 +59,22 @@ pub fn origin<H: Host>(interpreter: &mut Interpreter, host: &mut H) {
 
 // EIP-4844: Shard Blob Transactions
 pub fn blob_hash<H: Host, SPEC: Spec>(interpreter: &mut Interpreter, host: &mut H) {
+    println!("\t# blob_hash");
     check!(interpreter, CANCUN);
     gas!(interpreter, gas::VERYLOW);
     pop_top!(interpreter, index);
+    println!("\t# blob_hash: {index}");
     let i = as_usize_saturated!(index);
     *index = match host.env().tx.blob_hashes.get(i) {
         Some(hash) => U256::from_be_bytes(hash.0),
         None => U256::ZERO,
     };
+    println!("\t-> blob_hash done: {index}");
 }
 
 /// EIP-7516: BLOBBASEFEE opcode
 pub fn blob_basefee<H: Host, SPEC: Spec>(interpreter: &mut Interpreter, host: &mut H) {
+    println!("'\t# blob_basefee");
     check!(interpreter, CANCUN);
     gas!(interpreter, gas::BASE);
     push!(

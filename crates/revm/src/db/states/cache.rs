@@ -47,8 +47,8 @@ impl CacheState {
     /// Helper function that returns all accounts.
     ///
     /// Used inside tests to generate merkle tree.
-    pub fn trie_account(&self) -> impl IntoIterator<Item = (Address, &PlainAccount)> {
-        self.accounts.iter().filter_map(|(address, account)| {
+    pub fn trie_account(&self) -> impl IntoIterator<Item=(Address, &PlainAccount)> {
+        self.accounts.iter().filter_map(move |(address, account)| {
             account
                 .account
                 .as_ref()
@@ -89,6 +89,7 @@ impl CacheState {
 
     /// Apply output of revm execution and create account transitions that are used to build BundleState.
     pub fn apply_evm_state(&mut self, evm_state: EVMState) -> Vec<(Address, TransitionAccount)> {
+        println!("\n\n\t██████████ APPLY STATE");
         let mut transitions = Vec::with_capacity(evm_state.len());
         for (address, account) in evm_state {
             if let Some(transition) = self.apply_account_state(address, account) {
@@ -114,6 +115,31 @@ impl CacheState {
             .accounts
             .get_mut(&address)
             .expect("All accounts should be present inside cache");
+        // TODOFEE
+        println!("\n-> apply_account_state: {address}");
+        if let Some(acc) = &this_account.account {
+            let info = acc.info.clone();
+            println!("    balance: {:?}", info.balance.to_string());
+            println!("    code: {:?}", info.code);
+            println!("    nonce: {:?}", info.nonce);
+            println!("    storage: {:#?}", acc.storage);
+            if info.balance > account.info.balance {
+                println!("    CHANGED: {}", info.balance - account.info.balance);
+            } else {
+                println!("    CHANGED: +{}", account.info.balance - info.balance);
+            }
+        } else {
+            println!("STATUS: {:?}", this_account.status);
+        }
+        println!("=======");
+
+        let info = account.info.clone();
+        println!("    balance: {:?}", info.balance.to_string());
+        println!("    code: {:?}", info.code);
+        println!("    nonce: {:?}", info.nonce);
+        println!("    storage: {:#?}", account.storage);
+        println!("STATUS: {:?}", account.status);
+
 
         // If it is marked as selfdestructed inside revm
         // we need to changed state to destroyed.

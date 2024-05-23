@@ -52,12 +52,16 @@ pub fn deduct_caller_inner<SPEC: Spec>(caller_account: &mut Account, env: &Env) 
 
     // EIP-4844
     if SPEC::enabled(CANCUN) {
+        // TODOFEE
         let data_fee = env.calc_data_fee().expect("already checked");
+        println!("-> deduct_caller data_fee for CANCUN: {gas_cost} + {data_fee} [gas_cost + data_fee]");
         gas_cost = gas_cost.saturating_add(data_fee);
     }
 
     // set new caller account balance.
     caller_account.info.balance = caller_account.info.balance.saturating_sub(gas_cost);
+    // TODOFEE
+    println!("-> deduct_caller_inner: {} [{gas_cost} gas_cost  = limit * effective_gas + [data_fee] {} * {}]", caller_account.info.balance, env.tx.gas_limit, env.effective_gas_price());
 
     // bump the nonce for calls. Nonce for CREATE will be bumped in `handle_create`.
     if matches!(env.tx.transact_to, TransactTo::Call(_)) {

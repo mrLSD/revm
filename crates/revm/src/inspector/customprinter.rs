@@ -6,7 +6,7 @@ use revm_interpreter::CreateOutcome;
 
 use crate::{
     inspectors::GasInspector,
-    interpreter::{opcode, CallInputs, CreateInputs, Interpreter},
+    interpreter::{CallInputs, CreateInputs, Interpreter},
     primitives::{Address, U256},
     Database, EvmContext, Inspector,
 };
@@ -27,27 +27,6 @@ impl<DB: Database> Inspector<DB> for CustomPrintTracer {
     // get opcode by calling `interp.contract.opcode(interp.program_counter())`.
     // all other information can be obtained from interp.
     fn step(&mut self, interp: &mut Interpreter, context: &mut EvmContext<DB>) {
-        let opcode = interp.current_opcode();
-        let opcode_str = opcode::OPCODE_JUMPMAP[opcode as usize];
-
-        let gas_remaining = self.gas_inspector.gas_remaining();
-
-        let memory_size = interp.shared_memory.len();
-
-        println!(
-            "depth:{}, PC:{}, gas:{:#x}({}), OPCODE: {:?}({:?})  refund:{:#x}({}) Stack:{:?}, Data size:{}",
-            context.journaled_state.depth(),
-            interp.program_counter(),
-            gas_remaining,
-            gas_remaining,
-            opcode_str.unwrap_or("UNKNOWN"),
-            opcode,
-            interp.gas.refunded(),
-            interp.gas.refunded(),
-            interp.stack.data(),
-            memory_size,
-        );
-
         self.gas_inspector.step(interp, context);
     }
 

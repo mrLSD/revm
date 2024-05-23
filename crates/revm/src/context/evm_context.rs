@@ -22,8 +22,8 @@ pub struct EvmContext<DB: Database> {
 }
 
 impl<DB: Database + Clone> Clone for EvmContext<DB>
-where
-    DB::Error: Clone,
+    where
+        DB::Error: Clone,
 {
     fn clone(&self) -> Self {
         Self {
@@ -34,9 +34,9 @@ where
 }
 
 impl<DB> fmt::Debug for EvmContext<DB>
-where
-    DB: Database + fmt::Debug,
-    DB::Error: fmt::Debug,
+    where
+        DB: Database + fmt::Debug,
+        DB::Error: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("EvmContext")
@@ -110,6 +110,8 @@ impl<DB: Database> EvmContext<DB> {
             .precompiles
             .call(address, input_data, gas.limit(), &mut self.inner)?;
 
+        // TODOFEE
+        println!("-> call_precompile: {address}");
         let mut result = InterpreterResult {
             result: InstructionResult::Return,
             gas,
@@ -198,6 +200,8 @@ impl<DB: Database> EvmContext<DB> {
                 inputs.return_memory_offset.clone(),
             ))
         } else if !bytecode.is_empty() {
+            // TODOFEE
+            println!("-> CALL: {} -> {}", inputs.context.caller, inputs.contract);
             let contract = Contract::new_with_context(
                 inputs.input.clone(),
                 bytecode,

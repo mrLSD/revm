@@ -122,6 +122,7 @@ impl Env {
                 .map(|limit| limit.saturating_mul(2))
                 .unwrap_or(MAX_INITCODE_SIZE);
             if self.tx.data.len() > max_initcode_size {
+                println!("validate_tx: {} > {}", self.tx.data.len(), max_initcode_size);
                 return Err(InvalidTransaction::CreateInitCodeSizeLimit);
             }
         }
@@ -146,11 +147,13 @@ impl Env {
                 // ensure that the user was willing to at least pay the current blob gasprice
                 let price = self.block.get_blob_gasprice().expect("already checked");
                 if U256::from(price) > max {
+                    println!("-> BlobGasPriceGreaterThanMax");
                     return Err(InvalidTransaction::BlobGasPriceGreaterThanMax);
                 }
 
                 // there must be at least one blob
                 if self.tx.blob_hashes.is_empty() {
+                    println!("-> EmptyBlobs");
                     return Err(InvalidTransaction::EmptyBlobs);
                 }
 
@@ -159,12 +162,14 @@ impl Env {
                 // a 20-byte address. This means that blob transactions cannot
                 // have the form of a create transaction.
                 if self.tx.transact_to.is_create() {
+                    println!("-> BlobCreateTransaction");
                     return Err(InvalidTransaction::BlobCreateTransaction);
                 }
 
                 // all versioned blob hashes must start with VERSIONED_HASH_VERSION_KZG
                 for blob in self.tx.blob_hashes.iter() {
                     if blob[0] != VERSIONED_HASH_VERSION_KZG {
+                        println!("-> BlobVersionNotSupported");
                         return Err(InvalidTransaction::BlobVersionNotSupported);
                     }
                 }
@@ -172,6 +177,7 @@ impl Env {
                 // ensure the total blob gas spent is at most equal to the limit
                 // assert blob_gas_used <= MAX_BLOB_GAS_PER_BLOCK
                 if self.tx.blob_hashes.len() > MAX_BLOB_NUMBER_PER_BLOCK as usize {
+                    println!("-> TooManyBlobs");
                     return Err(InvalidTransaction::TooManyBlobs);
                 }
             }
@@ -193,6 +199,8 @@ impl Env {
         &self,
         account: &mut Account,
     ) -> Result<(), InvalidTransaction> {
+        // TODOFEE
+        println!("-> validate_tx_against_state");
         // EIP-3607: Reject transactions from senders with deployed code
         // This EIP is introduced after london but there was no collision in past
         // so we can leave it enabled always

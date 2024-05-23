@@ -34,8 +34,8 @@ pub struct InnerEvmContext<DB: Database> {
 }
 
 impl<DB: Database + Clone> Clone for InnerEvmContext<DB>
-where
-    DB::Error: Clone,
+    where
+        DB::Error: Clone,
 {
     fn clone(&self) -> Self {
         Self {
@@ -238,7 +238,6 @@ impl<DB: Database> InnerEvmContext<DB> {
                 None,
             ))
         };
-
         // Check depth
         if self.journaled_state.depth() > CALL_STACK_LIMIT {
             return return_error(InstructionResult::CallTooDeep);
@@ -271,7 +270,8 @@ impl<DB: Database> InnerEvmContext<DB> {
         };
 
         // Load account so it needs to be marked as warm for access list.
-        self.journaled_state
+        self
+            .journaled_state
             .load_account(created_address, &mut self.db)?;
 
         // create account, transfer funds and make the journal checkpoint.
@@ -350,11 +350,11 @@ impl<DB: Database> InnerEvmContext<DB> {
         // By default limit is 0x6000 (~25kb)
         if SPEC::enabled(SPURIOUS_DRAGON)
             && interpreter_result.output.len()
-                > self
-                    .env
-                    .cfg
-                    .limit_contract_code_size
-                    .unwrap_or(MAX_CODE_SIZE)
+            > self
+            .env
+            .cfg
+            .limit_contract_code_size
+            .unwrap_or(MAX_CODE_SIZE)
         {
             self.journaled_state.checkpoint_revert(journal_checkpoint);
             interpreter_result.result = InstructionResult::CreateContractSizeLimit;

@@ -155,15 +155,15 @@ pub fn sstore<H: Host, SPEC: Spec>(interpreter: &mut Interpreter, host: &mut H) 
 
     pop!(interpreter, index, value);
     let Some(SStoreResult {
-        original_value: original,
-        present_value: old,
-        new_value: new,
-        is_cold,
-    }) = host.sstore(interpreter.contract.address, index, value)
-    else {
-        interpreter.instruction_result = InstructionResult::FatalExternalError;
-        return;
-    };
+                 original_value: original,
+                 present_value: old,
+                 new_value: new,
+                 is_cold,
+             }) = host.sstore(interpreter.contract.address, index, value)
+        else {
+            interpreter.instruction_result = InstructionResult::FatalExternalError;
+            return;
+        };
     gas_or_fail!(interpreter, {
         let remaining_gas = interpreter.gas.remaining();
         gas::sstore_cost::<SPEC>(original, old, new, remaining_gas, is_cold)
@@ -442,9 +442,9 @@ pub fn delegate_call<H: Host, SPEC: Spec>(interpreter: &mut Interpreter, host: &
 
     let Some(gas_limit) =
         calc_call_gas::<H, SPEC>(interpreter, host, to, false, local_gas_limit, false, false)
-    else {
-        return;
-    };
+        else {
+            return;
+        };
 
     gas!(interpreter, gas_limit);
 
@@ -489,9 +489,9 @@ pub fn static_call<H: Host, SPEC: Spec>(interpreter: &mut Interpreter, host: &mu
 
     let Some(gas_limit) =
         calc_call_gas::<H, SPEC>(interpreter, host, to, false, local_gas_limit, false, true)
-    else {
-        return;
-    };
+        else {
+            return;
+        };
     gas!(interpreter, gas_limit);
 
     // Call host to interact with target contract
