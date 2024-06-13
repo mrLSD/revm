@@ -10,7 +10,7 @@ use crate::{
         keccak256, Account, Address, AnalysisKind, Bytecode, Bytes, CreateScheme, EVMError, Env,
         Eof, HashSet, Spec,
         SpecId::{self, *},
-        B256, U256,
+        B256, EOF_MAGIC_BYTES, EOF_MAGIC_HASH, U256,
     },
     FrameOrResult, JournalCheckpoint, CALL_STACK_LIMIT,
 };
@@ -160,20 +160,36 @@ impl<DB: Database> InnerEvmContext<DB> {
             .map(|(acc, is_cold)| (acc.info.balance, is_cold))
     }
 
-    /// Return account code and if address is cold loaded.
+    /// Return account code bytes and if address is cold loaded.
+    ///
+    /// In case of EOF account it will return `EOF_MAGIC` (0xEF00) as code.
     #[inline]
-    pub fn code(&mut self, address: Address) -> Result<(Bytecode, bool), EVMError<DB::Error>> {
+    pub fn code(&mut self, address: Address) -> Result<(Bytes, bool), EVMError<DB::Error>> {
         self.journaled_state
             .load_code(address, &mut self.db)
-            .map(|(a, is_cold)| (a.info.code.clone().unwrap(), is_cold))
+            .map(|(a, is_cold)| {
+                // SAFETY: safe to unwrap as load_code will insert code if it is empty.
+                let code = a.info.code.as_ref().unwrap();
+                if code.is_eof() {
+                    (EOF_MAGIC_BYTES.clone(), is_cold)
+                } else {
+                    (code.original_bytes().clone(), is_cold)
+                }
+            })
     }
 
     /// Get code hash of address.
+    ///
+    /// In case of EOF account it will return `EOF_MAGIC_HASH`
+    /// (the hash of `0xEF00`).
     #[inline]
     pub fn code_hash(&mut self, address: Address) -> Result<(B256, bool), EVMError<DB::Error>> {
         let (acc, is_cold) = self.journaled_state.load_code(address, &mut self.db)?;
         if acc.is_empty() {
             return Ok((B256::ZERO, is_cold));
+        }
+        if let Some(true) = acc.info.code.as_ref().map(|code| code.is_eof()) {
+            return Ok((EOF_MAGIC_HASH, is_cold));
         }
         Ok((acc.info.code_hash, is_cold))
     }
@@ -239,7 +255,6 @@ impl<DB: Database> InnerEvmContext<DB> {
                     output: Bytes::new(),
                 },
                 inputs.created_address,
-                inputs.return_memory_range.clone(),
             ))
         };
 
@@ -280,7 +295,7 @@ impl<DB: Database> InnerEvmContext<DB> {
         };
 
         let contract = Contract::new(
-            Bytes::new(),
+            inputs.input.clone(),
             // fine to clone as it is Bytes.
             Bytecode::Eof(inputs.eof_init_code.clone()),
             None,
@@ -295,7 +310,6 @@ impl<DB: Database> InnerEvmContext<DB> {
 
         Ok(FrameOrResult::new_eofcreate_frame(
             inputs.created_address,
-            inputs.return_memory_range.clone(),
             checkpoint,
             interpreter,
         ))

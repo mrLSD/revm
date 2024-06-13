@@ -99,15 +99,14 @@ pub fn extcodecopy<H: Host + ?Sized, SPEC: Spec>(interpreter: &mut Interpreter, 
     // Note: this can't panic because we resized memory to fit.
     interpreter
         .shared_memory
-        .set_data(memory_offset, code_offset, len, &code.original_bytes());
+        .set_data(memory_offset, code_offset, len, &code);
 }
 
 pub fn blockhash<H: Host + ?Sized, SPEC: Spec>(interpreter: &mut Interpreter, host: &mut H) {
     gas!(interpreter, gas::BLOCKHASH);
     pop_top!(interpreter, number);
 
-    let block_number = host.env().block.number;
-    let Some(hash) = host.block_hash(block_number) else {
+    let Some(hash) = host.block_hash(*number) else {
         interpreter.instruction_result = InstructionResult::FatalExternalError;
         return;
     };

@@ -64,20 +64,8 @@ pub struct Interpreter {
 
 impl Default for Interpreter {
     fn default() -> Self {
-        Self::new(Contract::default(), 0, false)
+        Self::new(Contract::default(), u64::MAX, false)
     }
-}
-
-/// The result of an interpreter operation.
-#[derive(Clone, Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "serde", derive(::serde::Serialize, ::serde::Deserialize))]
-pub struct InterpreterResult {
-    /// The result of the instruction execution.
-    pub result: InstructionResult,
-    /// The output of the instruction execution.
-    pub output: Bytes,
-    /// The gas usage information.
-    pub gas: Gas,
 }
 
 impl Interpreter {
@@ -204,6 +192,7 @@ impl Interpreter {
     }
 
     pub fn insert_eofcreate_outcome(&mut self, create_outcome: EOFCreateOutcome) {
+        self.instruction_result = InstructionResult::Continue;
         let instruction_result = create_outcome.instruction_result();
 
         self.return_data_buffer = if *instruction_result == InstructionResult::Revert {
@@ -261,32 +250,53 @@ impl Interpreter {
         call_outcome: CallOutcome,
     ) {
         self.instruction_result = InstructionResult::Continue;
-        self.return_data_buffer.clone_from(call_outcome.output());
 
         let out_offset = call_outcome.memory_start();
         let out_len = call_outcome.memory_length();
+        let out_ins_result = *call_outcome.instruction_result();
+        let out_gas = call_outcome.gas();
+        self.return_data_buffer = call_outcome.result.output;
 
         let target_len = min(out_len, self.return_data_buffer.len());
-        match call_outcome.instruction_result() {
+        match out_ins_result {
             return_ok!() => {
                 // return unspend gas.
-                let remaining = call_outcome.gas().remaining();
-                let refunded = call_outcome.gas().refunded();
-                self.gas.erase_cost(remaining);
-                self.gas.record_refund(refunded);
+                self.gas.erase_cost(out_gas.remaining());
+                self.gas.record_refund(out_gas.refunded());
                 shared_memory.set(out_offset, &self.return_data_buffer[..target_len]);
-                push!(self, U256::from(1));
+                push!(
+                    self,
+                    if self.is_eof {
+                        U256::ZERO
+                    } else {
+                        U256::from(1)
+                    }
+                );
             }
             return_revert!() => {
-                self.gas.erase_cost(call_outcome.gas().remaining());
+                self.gas.erase_cost(out_gas.remaining());
                 shared_memory.set(out_offset, &self.return_data_buffer[..target_len]);
-                push!(self, U256::ZERO);
+                push!(
+                    self,
+                    if self.is_eof {
+                        U256::from(1)
+                    } else {
+                        U256::ZERO
+                    }
+                );
             }
             InstructionResult::FatalExternalError => {
                 panic!("Fatal external error in insert_call_outcome");
             }
             _ => {
-                push!(self, U256::ZERO);
+                push!(
+                    self,
+                    if self.is_eof {
+                        U256::from(2)
+                    } else {
+                        U256::ZERO
+                    }
+                );
             }
         }
     }
@@ -389,7 +399,28 @@ impl Interpreter {
     }
 }
 
+/// The result of an interpreter operation.
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(::serde::Serialize, ::serde::Deserialize))]
+pub struct InterpreterResult {
+    /// The result of the instruction execution.
+    pub result: InstructionResult,
+    /// The output of the instruction execution.
+    pub output: Bytes,
+    /// The gas usage information.
+    pub gas: Gas,
+}
+
 impl InterpreterResult {
+    /// Returns a new `InterpreterResult` with the given values.
+    pub fn new(result: InstructionResult, output: Bytes, gas: Gas) -> Self {
+        Self {
+            result,
+            output,
+            gas,
+        }
+    }
+
     /// Returns whether the instruction result is a success.
     #[inline]
     pub const fn is_ok(&self) -> bool {

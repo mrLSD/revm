@@ -1,4 +1,4 @@
-use crate::{Address, Bytes, Log, State, U256};
+use crate::{Address, Bytes, EvmState, Log, U256};
 use core::fmt;
 use std::{boxed::Box, string::String, vec::Vec};
 
@@ -14,7 +14,7 @@ pub struct ResultAndState {
     /// Status of execution
     pub result: ExecutionResult,
     /// State that got updated
-    pub state: State,
+    pub state: EvmState,
 }
 
 /// Result of a transaction execution.
@@ -148,6 +148,8 @@ pub enum EVMError<DBError> {
     ///
     /// Useful for handler registers where custom logic would want to return their own custom error.
     Custom(String),
+    /// Precompile error.
+    Precompile(String),
 }
 
 #[cfg(feature = "std")]
@@ -157,7 +159,7 @@ impl<DBError: std::error::Error + 'static> std::error::Error for EVMError<DBErro
             Self::Transaction(e) => Some(e),
             Self::Header(e) => Some(e),
             Self::Database(e) => Some(e),
-            Self::Custom(_) => None,
+            Self::Precompile(_) | Self::Custom(_) => None,
         }
     }
 }
@@ -168,7 +170,7 @@ impl<DBError: fmt::Display> fmt::Display for EVMError<DBError> {
             Self::Transaction(e) => write!(f, "transaction validation error: {e}"),
             Self::Header(e) => write!(f, "header validation error: {e}"),
             Self::Database(e) => write!(f, "database error: {e}"),
-            Self::Custom(e) => f.write_str(e),
+            Self::Precompile(e) | Self::Custom(e) => f.write_str(e),
         }
     }
 }
@@ -388,6 +390,7 @@ pub enum SuccessReason {
     Stop,
     Return,
     SelfDestruct,
+    EofReturnContract,
 }
 
 /// Indicates that the EVM has experienced an exceptional halt. This causes execution to

@@ -13,10 +13,7 @@ use revm_interpreter::as_usize_saturated;
 use crate::{
     db::{Database, EmptyDB},
     interpreter::{Host, LoadAccountResult, SStoreResult, SelfDestructResult},
-    primitives::{
-        Address, Bytecode, EVMError, Env, HandlerCfg, Log, B256, BLOCKHASH_SERVE_WINDOW,
-        BLOCKHASH_STORAGE_ADDRESS, BLOCK_HASH_HISTORY, PRAGUE, U256,
-    },
+    primitives::{Address, Bytes, Env, HandlerCfg, Log, B256, BLOCK_HASH_HISTORY, U256},
 };
 use std::boxed::Box;
 
@@ -101,6 +98,8 @@ where
 }
 
 impl<EXT, DB: Database> Host for Context<EXT, DB> {
+    /// Returns reference to Environment.
+    #[inline]
     fn env(&self) -> &Env {
         &self.evm.env
     }
@@ -130,17 +129,6 @@ impl<EXT, DB: Database> Host for Context<EXT, DB> {
                 .ok();
         }
 
-        if self.evm.journaled_state.spec.is_enabled_in(PRAGUE) && diff <= BLOCKHASH_SERVE_WINDOW {
-            let index = number.wrapping_rem(U256::from(BLOCKHASH_SERVE_WINDOW));
-            return self
-                .evm
-                .db
-                .storage(BLOCKHASH_STORAGE_ADDRESS, index)
-                .map_err(|e| self.evm.error = Err(EVMError::Database(e)))
-                .ok()
-                .map(|v| v.into());
-        }
-
         Some(B256::ZERO)
     }
 
@@ -158,7 +146,7 @@ impl<EXT, DB: Database> Host for Context<EXT, DB> {
             .ok()
     }
 
-    fn code(&mut self, address: Address) -> Option<(Bytecode, bool)> {
+    fn code(&mut self, address: Address) -> Option<(Bytes, bool)> {
         self.evm
             .code(address)
             .map_err(|e| self.evm.error = Err(e))
