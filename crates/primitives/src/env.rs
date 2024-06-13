@@ -68,6 +68,7 @@ impl Env {
     /// <https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4844.md#execution-layer-validation>
     pub fn calc_max_data_fee(&self) -> Option<U256> {
         self.tx.max_fee_per_blob_gas.map(|max_fee_per_blob_gas| {
+            println!("max_fee_per_blob_gas: {max_fee_per_blob_gas}");
             max_fee_per_blob_gas.saturating_mul(U256::from(self.tx.get_total_blob_gas()))
         })
     }
@@ -231,12 +232,16 @@ impl Env {
             .and_then(|gas_cost| gas_cost.checked_add(self.tx.value))
             .ok_or(InvalidTransaction::OverflowPaymentInTransaction)?;
 
+        println!("{} * {} + {}", self.tx.gas_limit, self.tx.gas_price, self.tx.value);
+        println!("balance_check: {balance_check}");
         if SPEC::enabled(SpecId::CANCUN) {
             // if the tx is not a blob tx, this will be None, so we add zero
             let data_fee = self.calc_max_data_fee().unwrap_or_default();
             balance_check = balance_check
                 .checked_add(U256::from(data_fee))
                 .ok_or(InvalidTransaction::OverflowPaymentInTransaction)?;
+            // TODOFEE
+            println!("balance_check: {balance_check} > {}   [{data_fee}]", account.info.balance);
         }
 
         // Check if account has enough balance for gas_limit*gas_price and value transfer.

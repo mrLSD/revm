@@ -692,8 +692,10 @@ impl JournaledState {
         new: U256,
         db: &mut DB,
     ) -> Result<SStoreResult, EVMError<DB::Error>> {
+        println!("\n\n======> SSTORE: {address} => {key}");
         // assume that acc exists and load the slot.
         let (present, is_cold) = self.sload(address, key, db)?;
+        println!("[{is_cold}]: {present}");
         let acc = self.state.get_mut(&address).unwrap();
 
         // if there is no original value in dirty return present value, that is our original.

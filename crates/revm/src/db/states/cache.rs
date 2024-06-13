@@ -5,6 +5,7 @@ use revm_interpreter::primitives::{
     Account, AccountInfo, Address, Bytecode, HashMap, State as EVMState, B256,
 };
 use std::vec::Vec;
+use crate::primitives::PRECOMPILE3;
 
 /// Cache state contains both modified and original values.
 ///
@@ -115,32 +116,6 @@ impl CacheState {
             .accounts
             .get_mut(&address)
             .expect("All accounts should be present inside cache");
-        // TODOFEE
-        println!("\n-> apply_account_state: {address}");
-        if let Some(acc) = &this_account.account {
-            let info = acc.info.clone();
-            println!("    balance: {:?}", info.balance.to_string());
-            println!("    code: {:?}", info.code);
-            println!("    nonce: {:?}", info.nonce);
-            println!("    storage: {:#?}", acc.storage);
-            if info.balance > account.info.balance {
-                println!("    CHANGED: {}", info.balance - account.info.balance);
-            } else {
-                println!("    CHANGED: +{}", account.info.balance - info.balance);
-            }
-        } else {
-            println!("STATUS: {:?}", this_account.status);
-        }
-        println!("=======");
-
-        let info = account.info.clone();
-        println!("    balance: {:?}", info.balance.to_string());
-        println!("    code: {:?}", info.code);
-        println!("    nonce: {:?}", info.nonce);
-        println!("    storage: {:#?}", account.storage);
-        println!("STATUS: {:?}", account.status);
-
-
         // If it is marked as selfdestructed inside revm
         // we need to changed state to destroyed.
         if account.is_selfdestructed() {

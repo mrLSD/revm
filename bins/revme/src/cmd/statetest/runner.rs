@@ -124,10 +124,6 @@ fn check_evm_execution<EXT>(
     index: usize,
     spec_name: &SpecName,
 ) -> Result<(), TestError> {
-    match spec_name {
-        &SpecName::Cancun => (),
-        _ => return Ok(()),
-    }
     let logs_root = log_rlp_hash(exec_result.as_ref().map(|r| r.logs()).unwrap_or_default());
     let state_root = state_merkle_trie_root(evm.context.evm.db.cache.trie_account());
 
@@ -141,7 +137,6 @@ fn check_evm_execution<EXT>(
             .map(|r| r.gas_used())
             .unwrap_or_default(),
     );
-    println!("evmResult: {:?}", exec_result.as_ref());
 
     for (addr, acc) in &evm.context.evm.db.cache.accounts {
         if let Some(acc) = &acc.account {
@@ -211,7 +206,9 @@ fn check_evm_execution<EXT>(
             }
         }
         // return okay, exception is expected.
-        (Some(_), Err(_)) => return Ok(()),
+        (Some(_), Err(_)) => {
+            return Ok(());
+        }
         _ => {
             let kind = TestErrorKind::UnexpectedException {
                 expected_exception: test.expect_exception.clone(),
@@ -224,6 +221,10 @@ fn check_evm_execution<EXT>(
             });
         }
     }
+    if test_name == "create2collisionSelfdestructedOOG" {
+        panic!("\n> {test_name} {:#?}\n\n", test);
+    }
+
 
     if logs_root != test.logs {
         let kind = TestErrorKind::LogsRootMismatch {
@@ -260,17 +261,22 @@ pub fn execute_test_suite(
     trace: bool,
     print_json_outcome: bool,
 ) -> Result<(), TestError> {
+    println!("skip_test 1");
     if skip_test(path) {
         return Ok(());
     }
+    println!("skip_test 2");
 
     let s = std::fs::read_to_string(path).unwrap();
     let suite: TestSuite = serde_json::from_str(&s).map_err(|e| TestError {
         name: path.to_string_lossy().into_owned(),
         kind: e.into(),
     })?;
-
     for (name, unit) in suite.0 {
+        // TODOFEE
+        // if name != "create2collisionSelfdestructedOOG" {
+        //     continue;
+        // }
         // Create database and insert cache
         let mut cache_state = revm::CacheState::new(false);
         for (address, info) in unit.pre {
@@ -311,6 +317,8 @@ pub fn execute_test_suite(
                     parent_excess_blob_gas.to(),
                 ));
         }
+        // TODOFEE
+        // println!("@blob_excess_gas_and_price: {:#?}", env.block.blob_excess_gas_and_price);
 
         // tx env
         env.tx.caller = if let Some(address) = unit.transaction.sender {
@@ -345,7 +353,15 @@ pub fn execute_test_suite(
             let spec_id = spec_name.to_spec_id();
 
             for (index, test) in tests.into_iter().enumerate() {
-                if spec_id != SpecId::CANCUN {
+                println!("index: {index}");
+                // TODOFEE
+                if index != 0 {
+                    continue;
+                }
+                println!("=========: {name}-{index}");
+
+                // TODOFEE
+                if spec_id != SpecId::BERLIN {
                     continue;
                 }
 
@@ -442,6 +458,7 @@ pub fn execute_test_suite(
                         index,
                         &spec_name,
                     );
+                    println!("=> {res:?}");
                     let Err(e) = output else {
                         continue;
                     };

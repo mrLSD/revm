@@ -63,13 +63,13 @@ pub fn blob_hash<H: Host + ?Sized, SPEC: Spec>(interpreter: &mut Interpreter, ho
     check!(interpreter, CANCUN);
     gas!(interpreter, gas::VERYLOW);
     pop_top!(interpreter, index);
-    println!("\t# blob_hash: {index}");
     let i = as_usize_saturated!(index);
+    println!("\t# blob_hash: {i}");
     *index = match host.env().tx.blob_hashes.get(i) {
         Some(hash) => U256::from_be_bytes(hash.0),
         None => U256::ZERO,
     };
-    println!("\t-> blob_hash done: {index}");
+    println!("\t-> blob_hash done: {index:?}");
 }
 
 /// EIP-7516: BLOBBASEFEE opcode

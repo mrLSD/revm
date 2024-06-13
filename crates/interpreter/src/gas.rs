@@ -115,7 +115,7 @@ impl Gas {
     #[inline]
     pub fn set_refund(&mut self, refund: i64) {
         // TODOFEE
-        println!("\tset_refund: {refund}");
+        // println!("\tset_refund: {refund}");
         self.refunded = refund;
     }
 
@@ -130,7 +130,7 @@ impl Gas {
         if success {
             self.remaining = remaining;
             // TODOFEE
-            println!("\t# record_cost: {cost} [{} | {remaining}]", self.spent());
+            // println!("\t# record_cost: {cost} [{} | {remaining}]", self.spent());
         }
         success
     }

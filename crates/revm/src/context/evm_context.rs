@@ -208,7 +208,7 @@ impl<DB: Database> EvmContext<DB> {
             ))
         } else if !bytecode.is_empty() {
             // TODOFEE
-            println!("-> CALL: {} -> {}", inputs.caller, inputs.target_address);
+            // println!("-> CALL: {} -> {}", inputs.caller, inputs.target_address);
             let contract =
                 Contract::new_with_context(inputs.input.clone(), bytecode, Some(code_hash), inputs);
 

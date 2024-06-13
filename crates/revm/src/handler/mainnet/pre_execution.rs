@@ -64,7 +64,7 @@ pub fn deduct_caller_inner<SPEC: Spec>(caller_account: &mut Account, env: &Env) 
     if SPEC::enabled(CANCUN) {
         // TODOFEE
         let data_fee = env.calc_data_fee().expect("already checked");
-        println!("-> deduct_caller data_fee for CANCUN: {gas_cost} + {data_fee} [gas_cost + data_fee]");
+        println!("-> deduct_caller data_fee for CANCUN: {gas_cost} + {data_fee} [gas_cost + data_fee] [blob_hashes: {:?}]", env.tx.blob_hashes.len());
         gas_cost = gas_cost.saturating_add(data_fee);
     }
 

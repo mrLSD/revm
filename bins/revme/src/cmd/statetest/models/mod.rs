@@ -3,9 +3,11 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 mod deserializer;
+
 use deserializer::*;
 
 mod spec;
+
 pub use self::spec::SpecName;
 
 #[derive(Debug, PartialEq, Eq, Deserialize)]
@@ -121,7 +123,6 @@ pub type AccessList = Vec<AccessListItem>;
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use serde_json::Error;
 
