@@ -7,15 +7,22 @@ use super::{
 use crate::{BASE_FEE_RECIPIENT, L1_FEE_RECIPIENT};
 use core::ops::Mul;
 use revm::{
+    database_interface::Database,
     handler::{
         mainnet::{self, deduct_caller_inner},
         register::EvmHandler,
     },
     interpreter::{return_ok, return_revert, Gas, InstructionResult},
     precompile::{secp256r1, PrecompileSpecId},
-    primitives::{
-        db::Database, Account, Block, EVMError, EVMResult, EVMResultGeneric, EnvWiring,
-        ExecutionResult, HashMap, InvalidTransaction, ResultAndState, Transaction, U256,
+    primitives::{HashMap, U256},
+    state::Account,
+    wiring::{
+        default::EnvWiring,
+        result::{
+            EVMError, EVMResult, EVMResultGeneric, ExecutionResult, InvalidTransaction,
+            ResultAndState,
+        },
+        Block, Transaction,
     },
     Context, ContextPrecompiles, FrameResult,
 };
@@ -422,10 +429,12 @@ pub fn end<EvmWiringT: OptimismWiring, SPEC: OptimismSpec>(
 mod tests {
     use super::*;
     use crate::{BedrockSpec, L1BlockInfo, LatestSpec, OptimismEvmWiring, RegolithSpec};
+    use database::InMemoryDB;
     use revm::{
-        db::{EmptyDB, InMemoryDB},
+        database_interface::EmptyDB,
         interpreter::{CallOutcome, InterpreterResult},
-        primitives::{bytes, state::AccountInfo, Address, Bytes, B256},
+        primitives::{bytes, Address, Bytes, B256},
+        state::AccountInfo,
     };
     use std::boxed::Box;
 

@@ -3,15 +3,19 @@ use super::{
     models::{SpecName, Test, TestSuite},
     utils::recover_address,
 };
+use database::State;
 use indicatif::{ProgressBar, ProgressDrawTarget};
+use inspector::{inspector_handle_register, inspectors::TracerEip3155};
 use revm::{
-    db::{EmptyDB, State},
-    inspector_handle_register,
-    inspectors::TracerEip3155,
-    interpreter::analysis::to_analysed,
-    primitives::{
-        calc_excess_blob_gas, keccak256, Bytecode, Bytes, EVMResultGeneric, EnvWiring,
-        EthereumWiring, ExecutionResult, HaltReason, SpecId, TxKind, B256,
+    bytecode::Bytecode,
+    database_interface::EmptyDB,
+    primitives::{keccak256, Bytes, TxKind, B256},
+    specification::{eip7702::AuthorizationList, hardfork::SpecId},
+    wiring::{
+        block::calc_excess_blob_gas,
+        default::EnvWiring,
+        result::{EVMResultGeneric, ExecutionResult, HaltReason},
+        EthereumWiring,
     },
     Evm,
 };
@@ -277,11 +281,11 @@ pub fn execute_test_suite(
 
 
         // Create database and insert cache
-        let mut cache_state = revm::CacheState::new(false);
+        let mut cache_state = database::CacheState::new(false);
         for (address, info) in unit.pre {
             let code_hash = keccak256(&info.code);
-            let bytecode = to_analysed(Bytecode::new_raw(info.code));
-            let acc_info = revm::primitives::AccountInfo {
+            let bytecode = Bytecode::new_raw(info.code).into_analyzed();
+            let acc_info = revm::state::AccountInfo {
                 balance: info.balance,
                 code_hash,
                 code: Some(bytecode),
@@ -379,14 +383,17 @@ pub fn execute_test_suite(
                     .and_then(Option::as_deref)
                     .cloned()
                     .unwrap_or_default();
-                let Ok(auth_list) = test.eip7702_authorization_list() else {
-                    continue;
-                };
-                env.tx.authorization_list = auth_list;
-                if let Some(ref _al) = env.tx.authorization_list {
-                    // TODOFEE
-                    // println!("{path:?} [{spec_name:?}] {name:?}{index} {:?}\n", al);
-                }
+          
+
+                env.tx.authorization_list =
+                    unit.transaction
+                        .authorization_list
+                        .as_ref()
+                        .map(|auth_list| {
+                            AuthorizationList::Recovered(
+                                auth_list.iter().map(|auth| auth.into_recovered()).collect(),
+                            )
+                        });
 
                 let to = match unit.transaction.to {
                     Some(add) => TxKind::Call(add),
@@ -396,7 +403,7 @@ pub fn execute_test_suite(
 
                 let mut cache = cache_state.clone();
                 cache.set_state_clear_flag(SpecId::enabled(spec_id, SpecId::SPURIOUS_DRAGON));
-                let mut state = revm::db::State::builder()
+                let mut state = database::State::builder()
                     .with_cached_prestate(cache)
                     .with_bundle_update()
                     .build();
@@ -466,7 +473,7 @@ pub fn execute_test_suite(
                 // re build to run with tracing
                 let mut cache = cache_state.clone();
                 cache.set_state_clear_flag(SpecId::enabled(spec_id, SpecId::SPURIOUS_DRAGON));
-                let mut state = revm::db::State::builder()
+                let mut state = database::State::builder()
                     .with_cached_prestate(cache)
                     .with_bundle_update()
                     .build();

@@ -1,10 +1,7 @@
-use revm_primitives::{EnvWiring, EvmWiring};
-
-use super::analysis::to_analysed;
-use crate::{
-    primitives::{Address, Bytecode, Bytes, Transaction, TxKind, B256, U256},
-    CallInputs,
-};
+use crate::CallInputs;
+use bytecode::Bytecode;
+use primitives::{Address, Bytes, TxKind, B256, U256};
+use wiring::{default::EnvWiring, EvmWiring, Transaction};
 
 /// EVM contract information.
 #[derive(Clone, Debug, Default)]
@@ -40,7 +37,7 @@ impl Contract {
         caller: Address,
         call_value: U256,
     ) -> Self {
-        let bytecode = to_analysed(bytecode);
+        let bytecode = bytecode.into_analyzed();
 
         Self {
             input,

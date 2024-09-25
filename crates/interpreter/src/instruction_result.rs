@@ -1,9 +1,8 @@
 use core::fmt::Debug;
-
-use derive_where::derive_where;
-use revm_primitives::EvmWiring;
-
-use crate::primitives::{HaltReason, OutOfGasError, SuccessReason};
+use wiring::{
+    result::{HaltReason, OutOfGasError, SuccessReason},
+    HaltReasonTrait,
+};
 
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
@@ -51,6 +50,8 @@ pub enum InstructionResult {
     PrecompileOOG,
     /// Out of gas error encountered while calling an invalid operand.
     InvalidOperandOOG,
+    /// Out of gas error encountered while checking for reentrancy sentry.
+    ReentrancySentryOOG,
     /// Unknown or invalid opcode.
     OpcodeNotFound,
     /// Invalid `CALL` with value transfer in static context.
@@ -119,6 +120,7 @@ impl From<HaltReason> for InstructionResult {
                 OutOfGasError::Memory => Self::MemoryOOG,
                 OutOfGasError::MemoryLimit => Self::MemoryLimitOOG,
                 OutOfGasError::Precompile => Self::PrecompileOOG,
+                OutOfGasError::ReentrancySentry => Self::ReentrancySentryOOG,
             },
             HaltReason::OpcodeNotFound => Self::OpcodeNotFound,
             HaltReason::InvalidFEOpcode => Self::InvalidFEOpcode,
@@ -177,6 +179,7 @@ macro_rules! return_error {
             | InstructionResult::MemoryLimitOOG
             | InstructionResult::PrecompileOOG
             | InstructionResult::InvalidOperandOOG
+            | InstructionResult::ReentrancySentryOOG
             | InstructionResult::OpcodeNotFound
             | InstructionResult::CallNotAllowedInsideStatic
             | InstructionResult::StateChangeDuringStaticCall
@@ -236,17 +239,16 @@ pub enum InternalResult {
     InvalidExtDelegateCallTarget,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Hash)]
-#[derive_where(Debug; EvmWiringT::HaltReason)]
-pub enum SuccessOrHalt<EvmWiringT: EvmWiring> {
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub enum SuccessOrHalt<HaltReasonT: HaltReasonTrait> {
     Success(SuccessReason),
     Revert,
-    Halt(EvmWiringT::HaltReason),
+    Halt(HaltReasonT),
     FatalExternalError,
     Internal(InternalResult),
 }
 
-impl<EvmWiringT: EvmWiring> SuccessOrHalt<EvmWiringT> {
+impl<HaltReasonT: HaltReasonTrait> SuccessOrHalt<HaltReasonT> {
     /// Returns true if the transaction returned successfully without halts.
     #[inline]
     pub fn is_success(self) -> bool {
@@ -276,7 +278,7 @@ impl<EvmWiringT: EvmWiring> SuccessOrHalt<EvmWiringT> {
 
     /// Returns the [HaltReason] value the EVM has experienced an exceptional halt
     #[inline]
-    pub fn to_halt(self) -> Option<EvmWiringT::HaltReason> {
+    pub fn to_halt(self) -> Option<HaltReasonT> {
         match self {
             SuccessOrHalt::Halt(reason) => Some(reason),
             _ => None,
@@ -284,7 +286,7 @@ impl<EvmWiringT: EvmWiring> SuccessOrHalt<EvmWiringT> {
     }
 }
 
-impl<EvmWiringT: EvmWiring> From<InstructionResult> for SuccessOrHalt<EvmWiringT> {
+impl<HaltReasonT: HaltReasonTrait> From<InstructionResult> for SuccessOrHalt<HaltReasonT> {
     fn from(result: InstructionResult) -> Self {
         match result {
             InstructionResult::Continue => Self::Internal(InternalResult::InternalContinue), // used only in interpreter loop
@@ -310,6 +312,9 @@ impl<EvmWiringT: EvmWiring> From<InstructionResult> for SuccessOrHalt<EvmWiringT
             }
             InstructionResult::InvalidOperandOOG => {
                 Self::Halt(HaltReason::OutOfGas(OutOfGasError::InvalidOperand).into())
+            }
+            InstructionResult::ReentrancySentryOOG => {
+                Self::Halt(HaltReason::OutOfGas(OutOfGasError::ReentrancySentry).into())
             }
             InstructionResult::OpcodeNotFound | InstructionResult::ReturnContractInNotInitEOF => {
                 Self::Halt(HaltReason::OpcodeNotFound.into())
