@@ -9,10 +9,7 @@ pub use contract::Contract;
 pub use shared_memory::{num_words, SharedMemory, EMPTY_SHARED_MEMORY};
 pub use stack::{Stack, STACK_LIMIT};
 
-use crate::{
-    gas, primitives::Bytes, push, push_b256, return_ok, return_revert, CallOutcome, CreateOutcome,
-    FunctionStack, Gas, Host, InstructionResult, InterpreterAction,
-};
+use crate::{gas, primitives::Bytes, push, push_b256, return_ok, return_revert, CallOutcome, CreateOutcome, FunctionStack, Gas, Host, InstructionResult, InterpreterAction, OpCode};
 use core::cmp::min;
 use revm_primitives::{Bytecode, Eof, U256};
 use std::borrow::ToOwned;
@@ -353,6 +350,8 @@ impl Interpreter {
     {
         // Get current opcode.
         let opcode = unsafe { *self.instruction_pointer };
+        // TODOFEE
+        println!("OPCODE({})", OpCode::new(opcode).unwrap());
 
         // SAFETY: In analysis we are doing padding of bytecode so that we are sure that last
         // byte instruction is STOP so we are safe to just increment program_counter bcs on last instruction
@@ -477,15 +476,14 @@ mod tests {
 
         let mut host = crate::DummyHost::<DefaultEthereumWiring>::default();
         let table: &InstructionTable<DummyHost<DefaultEthereumWiring>> =
-            &crate::opcode::make_instruction_table::<DummyHost<DefaultEthereumWiring>, CancunSpec>(
-            );
+            &crate::opcode::make_instruction_table::<DummyHost<DefaultEthereumWiring>, CancunSpec>();
         let _ = interp.run(EMPTY_SHARED_MEMORY, table, &mut host);
 
-        let host: &mut dyn Host<EvmWiringT = DefaultEthereumWiring> =
-            &mut host as &mut dyn Host<EvmWiringT = DefaultEthereumWiring>;
-        let table: &InstructionTable<dyn Host<EvmWiringT = DefaultEthereumWiring>> =
+        let host: &mut dyn Host<EvmWiringT=DefaultEthereumWiring> =
+            &mut host as &mut dyn Host<EvmWiringT=DefaultEthereumWiring>;
+        let table: &InstructionTable<dyn Host<EvmWiringT=DefaultEthereumWiring>> =
             &crate::opcode::make_instruction_table::<
-                dyn Host<EvmWiringT = DefaultEthereumWiring>,
+                dyn Host<EvmWiringT=DefaultEthereumWiring>,
                 CancunSpec,
             >();
         let _ = interp.run(EMPTY_SHARED_MEMORY, table, host);

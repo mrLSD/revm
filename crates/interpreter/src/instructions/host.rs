@@ -46,7 +46,11 @@ pub fn extcodesize<H: Host + ?Sized, SPEC: Spec>(interpreter: &mut Interpreter, 
         interpreter.instruction_result = InstructionResult::FatalExternalError;
         return;
     };
+    println!("extcodesize: {address:?}");
+    println!("load: {code:?}");
     let (code, load) = code.into_components();
+    println!("code: [{}] {code:X?}", code.len());
+
     if SPEC::enabled(BERLIN) {
         gas!(interpreter, warm_cold_cost_with_delegation(load));
     } else if SPEC::enabled(TANGERINE) {
@@ -67,6 +71,7 @@ pub fn extcodehash<H: Host + ?Sized, SPEC: Spec>(interpreter: &mut Interpreter, 
         return;
     };
     let (code_hash, load) = code_hash.into_components();
+    println!("@ {address:?}: {code_hash:?}");
     if SPEC::enabled(BERLIN) {
         gas!(interpreter, warm_cold_cost_with_delegation(load))
     } else if SPEC::enabled(ISTANBUL) {
@@ -74,12 +79,14 @@ pub fn extcodehash<H: Host + ?Sized, SPEC: Spec>(interpreter: &mut Interpreter, 
     } else {
         gas!(interpreter, 400);
     }
+    println!("PUSH: {code_hash:?}");
     push_b256!(interpreter, code_hash);
 }
 
 pub fn extcodecopy<H: Host + ?Sized, SPEC: Spec>(interpreter: &mut Interpreter, host: &mut H) {
     pop_address!(interpreter, address);
     pop!(interpreter, memory_offset, code_offset, len_u256);
+    println!("extcodecopy: {address:?}: {memory_offset:?} {code_offset:?} {len_u256:?}");
 
     let Some(code) = host.code(address) else {
         interpreter.instruction_result = InstructionResult::FatalExternalError;
@@ -92,6 +99,7 @@ pub fn extcodecopy<H: Host + ?Sized, SPEC: Spec>(interpreter: &mut Interpreter, 
         interpreter,
         gas::extcodecopy_cost(SPEC::SPEC_ID, len as u64, load)
     );
+    println!("EXT: {len} {code:X?}");
     if len == 0 {
         return;
     }
@@ -131,6 +139,7 @@ pub fn sstore<H: Host + ?Sized, SPEC: Spec>(interpreter: &mut Interpreter, host:
     require_non_staticcall!(interpreter);
 
     pop!(interpreter, index, value);
+    print!("##### SSTORE [{index:?}]: {:X?} ", value.to_be_bytes::<32>());
     let Some(state_load) = host.sstore(interpreter.contract.target_address, index, value) else {
         interpreter.instruction_result = InstructionResult::FatalExternalError;
         return;

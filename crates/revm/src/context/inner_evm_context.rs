@@ -18,7 +18,8 @@ use crate::{
 use std::{boxed::Box, sync::Arc};
 
 /// EVM contexts contains data that EVM needs for execution.
-#[derive_where(Clone, Debug; EvmWiringT::Block, EvmWiringT::ChainContext, EvmWiringT::Transaction, EvmWiringT::Database, <EvmWiringT::Database as Database>::Error)]
+#[derive_where(Clone, Debug; EvmWiringT::Block, EvmWiringT::ChainContext, EvmWiringT::Transaction, EvmWiringT::Database, <EvmWiringT::Database as Database>::Error
+)]
 pub struct InnerEvmContext<EvmWiringT: EvmWiring> {
     /// EVM Environment contains all the information about config, block and transaction that
     /// evm needs.
@@ -66,7 +67,7 @@ impl<EvmWiringT: EvmWiring> InnerEvmContext<EvmWiringT> {
     /// Note that this will ignore the previous `error` if set.
     #[inline]
     pub fn with_db<
-        OWiring: EvmWiring<Block = EvmWiringT::Block, Transaction = EvmWiringT::Transaction>,
+        OWiring: EvmWiring<Block=EvmWiringT::Block, Transaction=EvmWiringT::Transaction>,
     >(
         self,
         db: OWiring::Database,
@@ -190,6 +191,8 @@ impl<EvmWiringT: EvmWiring> InnerEvmContext<EvmWiringT> {
         if let Bytecode::Eip7702(code) = code {
             let address = code.address();
             let is_cold = a.is_cold;
+            // TODOFEE
+            println!("## CODE: {address:?} [{is_cold}]");
 
             let delegated_account = self.journaled_state.load_code(address, &mut self.db)?;
 
@@ -231,11 +234,15 @@ impl<EvmWiringT: EvmWiring> InnerEvmContext<EvmWiringT> {
         let code = acc.info.code.as_ref().unwrap();
 
         // If bytecode is EIP-7702 then we need to load the delegated account.
+        println!("### code_hash for: {address:?}");
         if let Bytecode::Eip7702(code) = code {
             let address = code.address();
             let is_cold = acc.is_cold;
+            // TODOFEE
+            println!("### code_hash delegated: {address:?} [{is_cold}]");
 
             let delegated_account = self.journaled_state.load_code(address, &mut self.db)?;
+            println!("# codehash code: z{:X?}", delegated_account.info.code);
 
             let hash = if delegated_account.is_empty() {
                 B256::ZERO

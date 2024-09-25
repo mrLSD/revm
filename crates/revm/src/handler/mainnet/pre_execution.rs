@@ -153,6 +153,8 @@ pub fn apply_eip7702_auth_list<EvmWiringT: EvmWiring, SPEC: Spec>(
         if authorization.nonce() != authority_acc.info.nonce {
             continue;
         }
+        // TODOFEE
+        println!("[5] {:?} => {:?}", authority, authorization.address);
 
         // 6. Refund the sender PER_EMPTY_ACCOUNT_COST - PER_AUTH_BASE_COST gas if authority exists in the trie.
         if !authority_acc.is_empty() {
@@ -167,10 +169,11 @@ pub fn apply_eip7702_auth_list<EvmWiringT: EvmWiring, SPEC: Spec>(
         // 8. Increase the nonce of authority by one.
         authority_acc.info.nonce = authority_acc.info.nonce.saturating_add(1);
         authority_acc.mark_touch();
+        println!("PASS");
     }
 
     let refunded_gas =
         refunded_accounts * (eip7702::PER_EMPTY_ACCOUNT_COST - eip7702::PER_AUTH_BASE_COST);
-
+    println!("refunded_accounts: {refunded_accounts}");
     Ok(refunded_gas)
 }

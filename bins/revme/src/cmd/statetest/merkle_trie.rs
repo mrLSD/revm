@@ -14,17 +14,28 @@ pub fn log_rlp_hash(logs: &[Log]) -> B256 {
 }
 
 pub fn state_merkle_trie_root<'a>(
-    accounts: impl IntoIterator<Item = (Address, &'a PlainAccount)>,
+    accounts: impl IntoIterator<Item=(Address, &'a PlainAccount)>,
 ) -> B256 {
     trie_root(accounts.into_iter().map(|(address, acc)| {
+        let t = TrieAccount::new(acc);
+        let s: Vec<_> = acc.storage
+            .iter()
+            .filter(|(_k, &v)| !v.is_zero())
+            .collect();
+        println!("@ {address:?}:");
+        for (k, v) in s {
+            // TODOFEE
+            println!("  {k:?}: {:X?}", v.to_be_bytes::<32>());
+        }
+        println!("");
         (
             address,
-            alloy_rlp::encode_fixed_size(&TrieAccount::new(acc)),
+            alloy_rlp::encode_fixed_size(&t),
         )
     }))
 }
 
-#[derive(RlpEncodable, RlpMaxEncodedLen)]
+#[derive(Debug, RlpEncodable, RlpMaxEncodedLen)]
 struct TrieAccount {
     nonce: u64,
     balance: U256,
@@ -51,7 +62,7 @@ impl TrieAccount {
 #[inline]
 pub fn trie_root<I, A, B>(input: I) -> B256
 where
-    I: IntoIterator<Item = (A, B)>,
+    I: IntoIterator<Item=(A, B)>,
     A: AsRef<[u8]>,
     B: AsRef<[u8]>,
 {

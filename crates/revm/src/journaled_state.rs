@@ -551,7 +551,7 @@ impl JournaledState {
     pub fn initial_account_load<DB: Database>(
         &mut self,
         address: Address,
-        storage_keys: impl IntoIterator<Item = U256>,
+        storage_keys: impl IntoIterator<Item=U256>,
         db: &mut DB,
     ) -> Result<&mut Account, DB::Error> {
         // load or get account.
@@ -635,6 +635,7 @@ impl JournaledState {
         if let Some(Bytecode::Eip7702(code)) = &account.info.code {
             let address = code.address();
             let delegate_account = self.load_account(address, db)?;
+            println!("## load_account_delegated: {address:?} [{}]", delegate_account.is_cold);
             account_load
                 .load
                 .set_delegate_load(delegate_account.is_cold);
@@ -661,6 +662,8 @@ impl JournaledState {
                 acc.code = Some(code);
             }
         }
+        // TODOFEE
+        // println!("## load_code [{address:?}]: {:?}", acc);
         Ok(account_load)
     }
 

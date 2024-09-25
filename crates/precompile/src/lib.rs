@@ -174,6 +174,14 @@ impl Precompiles {
                 precompiles.extend(bls12_381::precompiles());
                 precompiles
             };
+            ;
+            for p in bls12_381::precompiles() {
+                println!("PREC: {:?}", p);
+            }
+            println!("===");
+            for p in &precompiles.addresses {
+                println!("PREC: {:?}", p);
+            }
 
             Box::new(precompiles)
         })
@@ -186,13 +194,13 @@ impl Precompiles {
 
     /// Returns an iterator over the precompiles addresses.
     #[inline]
-    pub fn addresses(&self) -> impl ExactSizeIterator<Item = &Address> {
+    pub fn addresses(&self) -> impl ExactSizeIterator<Item=&Address> {
         self.inner.keys()
     }
 
     /// Consumes the type and returns all precompile addresses.
     #[inline]
-    pub fn into_addresses(self) -> impl ExactSizeIterator<Item = Address> {
+    pub fn into_addresses(self) -> impl ExactSizeIterator<Item=Address> {
         self.inner.into_keys()
     }
 
@@ -233,7 +241,7 @@ impl Precompiles {
     ///
     /// Other precompiles with overwrite existing precompiles.
     #[inline]
-    pub fn extend(&mut self, other: impl IntoIterator<Item = PrecompileWithAddress>) {
+    pub fn extend(&mut self, other: impl IntoIterator<Item=PrecompileWithAddress>) {
         let items = other.into_iter().collect::<Vec<_>>();
         self.addresses.extend(items.iter().map(|p| *p.address()));
         self.inner.extend(items.into_iter().map(Into::into));

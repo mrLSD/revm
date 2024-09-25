@@ -46,6 +46,7 @@ impl AuthorizationList {
             // }
 
             // Check y_parity, Parity::Parity means that it was 0 or 1.
+            println!("# {:?}", auth.signature().v());
             if !matches!(auth.signature().v(), Parity::Parity(_)) {
                 return Err(InvalidAuthorization::InvalidYParity);
             }
@@ -80,7 +81,7 @@ impl AuthorizationList {
     }
 
     /// Returns iterator of recovered Authorizations.
-    pub fn recovered_iter<'a>(&'a self) -> Box<dyn Iterator<Item = RecoveredAuthorization> + 'a> {
+    pub fn recovered_iter<'a>(&'a self) -> Box<dyn Iterator<Item=RecoveredAuthorization> + 'a> {
         match self {
             Self::Signed(signed) => Box::new(signed.iter().map(|signed| signed.clone().into())),
             Self::Recovered(recovered) => Box::new(recovered.clone().into_iter()),

@@ -290,6 +290,7 @@ impl CacheAccount {
             .unwrap_or_default();
 
         this_storage.extend(storage.iter().map(|(k, s)| (*k, s.present_value)));
+
         let changed_account = PlainAccount {
             info: new,
             storage: this_storage,

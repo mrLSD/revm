@@ -202,6 +202,8 @@ pub fn sstore_cost(spec_id: SpecId, vals: &SStoreResult, gas: u64, is_cold: bool
         if is_cold {
             gas_cost += COLD_SLOAD_COST;
         }
+        println!("=====> {gas_cost} [{is_cold\
+        }]");
         Some(gas_cost)
     } else if spec_id.is_enabled_in(SpecId::ISTANBUL) {
         // Istanbul logic
@@ -293,7 +295,7 @@ pub const fn selfdestruct_cost(spec_id: SpecId, res: StateLoad<SelfDestructResul
 /// [`crate::OpCode::CALLCODE`] need to have this field hardcoded to false
 /// as they were present before SPURIOUS_DRAGON hardfork.
 #[inline]
-pub const fn call_cost(spec_id: SpecId, transfers_value: bool, account_load: AccountLoad) -> u64 {
+pub fn call_cost(spec_id: SpecId, transfers_value: bool, account_load: AccountLoad) -> u64 {
     // Account access.
     let mut gas = if spec_id.is_enabled_in(SpecId::BERLIN) {
         warm_cold_cost_with_delegation(account_load.load)
@@ -379,10 +381,10 @@ pub fn validate_initial_tx_gas(
     // EIP-2028: Transaction data gas cost reduction
     initial_gas += non_zero_data_len
         * if spec_id.is_enabled_in(SpecId::ISTANBUL) {
-            16
-        } else {
-            68
-        };
+        16
+    } else {
+        68
+    };
 
     // get number of access list account and storages.
     if spec_id.is_enabled_in(SpecId::BERLIN) {

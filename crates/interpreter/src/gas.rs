@@ -95,6 +95,8 @@ impl Gas {
     /// at the end of transact.
     #[inline]
     pub fn record_refund(&mut self, refund: i64) {
+        // TODOFEE
+        println!("\trecord_refund: {}", refund);
         self.refunded += refund;
     }
 
@@ -126,6 +128,8 @@ impl Gas {
         if success {
             self.remaining = remaining;
         }
+        // TODOFEE
+        println!("\t# record_cost: {cost} [{} | {remaining}]", self.spent());
         success
     }
 }

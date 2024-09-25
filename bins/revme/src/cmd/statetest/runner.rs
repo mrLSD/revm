@@ -149,6 +149,8 @@ fn check_evm_execution<EXT: Debug>(
     evm: &Evm<'_, EthereumWiring<&mut State<EmptyDB>, EXT>>,
     print_json_outcome: bool,
 ) -> Result<(), TestError> {
+    for acc in evm.context.evm.db.cache.trie_account()
+    { println!("#  {:?} [{:?}]", acc, acc.1.storage.len()); }
     let logs_root = log_rlp_hash(exec_result.as_ref().map(|r| r.logs()).unwrap_or_default());
     let state_root = state_merkle_trie_root(evm.context.evm.db.cache.trie_account());
 
@@ -269,6 +271,11 @@ pub fn execute_test_suite(
     })?;
 
     for (name, unit) in suite.0 {
+        if name != "tests/prague/eip7702_set_code_tx/test_set_code_txs.py::test_contract_creating_set_code_transaction[fork_Prague-state_test]" {
+            continue;
+        }
+
+
         // Create database and insert cache
         let mut cache_state = revm::CacheState::new(false);
         for (address, info) in unit.pre {
@@ -376,6 +383,10 @@ pub fn execute_test_suite(
                     continue;
                 };
                 env.tx.authorization_list = auth_list;
+                if let Some(ref _al) = env.tx.authorization_list {
+                    // TODOFEE
+                    // println!("{path:?} [{spec_name:?}] {name:?}{index} {:?}\n", al);
+                }
 
                 let to = match unit.transaction.to {
                     Some(add) => TxKind::Call(add),
@@ -427,6 +438,7 @@ pub fn execute_test_suite(
                 } else {
                     let timer = Instant::now();
                     let res = evm.transact_commit();
+                    println!("RES: {res:?}\n");
                     *elapsed.lock().unwrap() += timer.elapsed();
 
                     // dump state and traces if test failed

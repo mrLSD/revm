@@ -148,7 +148,6 @@ pub struct Authorization {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use serde_json::Error;
 

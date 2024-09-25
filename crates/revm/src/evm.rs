@@ -31,7 +31,7 @@ pub struct Evm<'a, EvmWiringT: EvmWiring> {
 impl<EvmWiringT> Debug for Evm<'_, EvmWiringT>
 where
     EvmWiringT:
-        EvmWiring<Block: Debug, Transaction: Debug, Database: Debug, ExternalContext: Debug>,
+    EvmWiring<Block: Debug, Transaction: Debug, Database: Debug, ExternalContext: Debug>,
     <EvmWiringT::Database as Database>::Error: Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -81,14 +81,14 @@ impl<'a, EvmWiringT: EvmWiring> Evm<'a, EvmWiringT> {
     pub fn modify(self) -> EvmBuilder<'a, SetGenericStage, EvmWiringT> {
         let Evm {
             context:
-                Context {
-                    evm:
-                        EvmContext {
-                            inner: InnerEvmContext { db, env, .. },
-                            ..
-                        },
-                    external,
+            Context {
+                evm:
+                EvmContext {
+                    inner: InnerEvmContext { db, env, .. },
+                    ..
                 },
+                external,
+            },
             handler,
         } = self;
         EvmBuilder::<'a>::new_with(db, external, env, handler)
@@ -361,6 +361,7 @@ impl<EvmWiringT: EvmWiring> Evm<'_, EvmWiringT> {
         pre_exec.deduct_caller(ctx)?;
 
         let gas_limit = ctx.evm.env.tx.gas_limit() - initial_gas_spend;
+        println!("{gas_limit} - {}", initial_gas_spend);
 
         // apply EIP-7702 auth list.
         let eip7702_gas_refund = pre_exec.apply_eip7702_auth_list(ctx)? as i64;
@@ -421,7 +422,6 @@ impl<EvmWiringT: EvmWiring> Evm<'_, EvmWiringT> {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use crate::{
         db::BenchmarkDB,
@@ -452,10 +452,10 @@ mod tests {
                             address: delegate,
                             nonce: 0,
                         }
-                        .into_signed(Signature::test_signature()),
+                            .into_signed(Signature::test_signature()),
                         Some(auth),
                     )]
-                    .into(),
+                        .into(),
                 );
                 tx.caller = caller;
                 tx.transact_to = TxKind::Call(auth);
