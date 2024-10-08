@@ -7,6 +7,7 @@ use database::{AlloyDB, CacheDB, StateBuilder};
 use indicatif::ProgressBar;
 use inspector::{inspector_handle_register, inspectors::TracerEip3155};
 use revm::{
+    database_interface::WrapDatabaseAsync,
     primitives::{TxKind, B256, U256},
     specification::eip2930::AccessListItem,
     wiring::EthereumWiring,
@@ -67,7 +68,7 @@ async fn main() -> anyhow::Result<()> {
     let prev_id: BlockId = previous_block_number.into();
     // SAFETY: This cannot fail since this is in the top-level tokio runtime
 
-    let state_db = AlloyDB::new(client, prev_id).unwrap();
+    let state_db = WrapDatabaseAsync::new(AlloyDB::new(client, prev_id)).unwrap();
     let cache_db: CacheDB<_> = CacheDB::new(state_db);
     let mut state = StateBuilder::new_with_database(cache_db).build();
     let mut evm = Evm::<EthereumWiring<_, _>>::builder()
@@ -111,7 +112,7 @@ async fn main() -> anyhow::Result<()> {
             .modify()
             .modify_tx_env(|etx| {
                 etx.caller = tx.from;
-                etx.gas_limit = tx.gas as u64;
+                etx.gas_limit = tx.gas;
                 etx.gas_price = U256::from(
                     tx.gas_price
                         .unwrap_or(tx.max_fee_per_gas.unwrap_or_default()),

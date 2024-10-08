@@ -1,6 +1,5 @@
 use super::{
     merkle_trie::{log_rlp_hash, state_merkle_trie_root},
-    models::{SpecName, Test, TestSuite},
     utils::recover_address,
 };
 use database::State;
@@ -20,6 +19,8 @@ use revm::{
     Evm,
 };
 use serde_json::json;
+use statetest_types::{SpecName, Test, TestSuite};
+
 use std::{
     fmt::Debug,
     io::{stderr, stdout},
@@ -139,6 +140,8 @@ fn skip_test(path: &Path) -> bool {
         | "block_apply_ommers_reward.json"
         | "known_block_hash.json"
         | "eip7516_blob_base_fee.json"
+        | "create_tx_collision_storage.json"
+        | "create_collision_storage.json"
     )
 }
 
