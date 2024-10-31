@@ -483,11 +483,11 @@ mod tests {
             &crate::table::make_instruction_table::<DummyHost<DefaultEthereumWiring>, CancunSpec>();
         let _ = interp.run(EMPTY_SHARED_MEMORY, table, &mut host);
 
-        let host: &mut dyn Host<EvmWiringT=DefaultEthereumWiring> =
-            &mut host as &mut dyn Host<EvmWiringT=DefaultEthereumWiring>;
-        let table: &InstructionTable<dyn Host<EvmWiringT=DefaultEthereumWiring>> =
+        let host: &mut dyn Host<EvmWiringT = DefaultEthereumWiring> =
+            &mut host as &mut dyn Host<EvmWiringT = DefaultEthereumWiring>;
+        let table: &InstructionTable<dyn Host<EvmWiringT = DefaultEthereumWiring>> =
             &crate::table::make_instruction_table::<
-                dyn Host<EvmWiringT=DefaultEthereumWiring>,
+                dyn Host<EvmWiringT = DefaultEthereumWiring>,
                 CancunSpec,
             >();
         let _ = interp.run(EMPTY_SHARED_MEMORY, table, host);
