@@ -268,7 +268,7 @@ pub fn execute_test_suite(
 
     for (name, unit) in suite.0 {
         if name != "tests/prague/eip7702_set_code_tx/test_set_code_txs.py::test_contract_creating_set_code_transaction[fork_Prague-state_test]" {
-            continue;
+            // continue;
         }
 
         // Create database and insert cache
