@@ -1,6 +1,10 @@
 use crate::interpreter_types::InputsTrait;
 use primitives::{Address, Bytes, U256};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct InputsImpl {
     pub target_address: Address,
     pub caller_address: Address,

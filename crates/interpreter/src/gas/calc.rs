@@ -1,9 +1,7 @@
 use super::constants::*;
 use crate::{num_words, tri, SStoreResult, SelfDestructResult, StateLoad};
-use context_interface::{
-    journaled_state::{AccountLoad, Eip7702CodeLoad},
-    transaction::AccessListTrait,
-};
+use context_interface::journaled_state::{AccountLoad, Eip7702CodeLoad};
+use handler_interface::InitialAndFloorGas;
 use primitives::U256;
 use specification::{eip7702, hardfork::SpecId};
 
@@ -298,16 +296,16 @@ pub fn call_cost(spec_id: SpecId, transfers_value: bool, account_load: AccountLo
         40
     };
 
-    // transfer value cost
+    // Transfer value cost
     if transfers_value {
         gas += CALLVALUE;
     }
 
-    // new account cost
+    // New account cost
     if account_load.is_empty {
         // EIP-161: State trie clearing (invariant-preserving alternative)
         if spec_id.is_enabled_in(SpecId::SPURIOUS_DRAGON) {
-            // account only if there is value transferred.
+            // Account only if there is value transferred.
             if transfers_value {
                 gas += NEWACCOUNT;
             }
@@ -352,36 +350,31 @@ pub const fn memory_gas(num_words: usize) -> u64 {
 
 /// Initial gas that is deducted for transaction to be included.
 /// Initial gas contains initial stipend gas, gas for access list and input data.
-pub fn validate_initial_tx_gas<AccessListT: AccessListTrait>(
+///
+/// # Returns
+///
+/// - Intrinsic gas
+/// - Number of tokens in calldata
+pub fn calculate_initial_tx_gas(
     spec_id: SpecId,
     input: &[u8],
     is_create: bool,
-    access_list: Option<&AccessListT>,
+    access_list_accounts: u64,
+    access_list_storages: u64,
     authorization_list_num: u64,
-) -> u64 {
-    let mut initial_gas = 0;
-    let zero_data_len = input.iter().filter(|v| **v == 0).count() as u64;
-    let non_zero_data_len = input.len() as u64 - zero_data_len;
+) -> InitialAndFloorGas {
+    let mut gas = InitialAndFloorGas::default();
 
-    // initdate stipend
-    initial_gas += zero_data_len * TRANSACTION_ZERO_DATA;
-    // EIP-2028: Transaction data gas cost reduction
-    initial_gas += non_zero_data_len
-        * if spec_id.is_enabled_in(SpecId::ISTANBUL) {
-            16
-        } else {
-            68
-        };
+    // Initdate stipend
+    let tokens_in_calldata = get_tokens_in_calldata(input, spec_id.is_enabled_in(SpecId::ISTANBUL));
+    gas.initial_gas += tokens_in_calldata * STANDARD_TOKEN_COST;
 
-    // get number of access list account and storages.
-    if let Some(access_list) = access_list {
-        let (account_num, storage_num) = access_list.num_account_storages();
-        initial_gas += account_num as u64 * ACCESS_LIST_ADDRESS;
-        initial_gas += storage_num as u64 * ACCESS_LIST_STORAGE_KEY;
-    }
+    // Get number of access list account and storages.
+    gas.initial_gas += access_list_accounts * ACCESS_LIST_ADDRESS;
+    gas.initial_gas += access_list_storages * ACCESS_LIST_STORAGE_KEY;
 
-    // base stipend
-    initial_gas += if is_create {
+    // Base stipend
+    gas.initial_gas += if is_create {
         if spec_id.is_enabled_in(SpecId::HOMESTEAD) {
             // EIP-2: Homestead Hard-fork Changes
             53000
@@ -395,13 +388,36 @@ pub fn validate_initial_tx_gas<AccessListT: AccessListTrait>(
     // EIP-3860: Limit and meter initcode
     // Init code stipend for bytecode analysis
     if spec_id.is_enabled_in(SpecId::SHANGHAI) && is_create {
-        initial_gas += initcode_cost(input.len())
+        gas.initial_gas += initcode_cost(input.len())
     }
 
     // EIP-7702
     if spec_id.is_enabled_in(SpecId::PRAGUE) {
-        initial_gas += authorization_list_num * eip7702::PER_EMPTY_ACCOUNT_COST;
+        gas.initial_gas += authorization_list_num * eip7702::PER_EMPTY_ACCOUNT_COST;
+
+        // Calculate gas floor for EIP-7623
+        gas.floor_gas = calc_tx_floor_cost(tokens_in_calldata);
     }
 
-    initial_gas
+    gas
+}
+
+/// Retrieve the total number of tokens in calldata.
+#[inline]
+pub fn get_tokens_in_calldata(input: &[u8], is_istanbul: bool) -> u64 {
+    let zero_data_len = input.iter().filter(|v| **v == 0).count() as u64;
+    let non_zero_data_len = input.len() as u64 - zero_data_len;
+    let non_zero_data_multiplier = if is_istanbul {
+        // EIP-2028: Transaction data gas cost reduction
+        NON_ZERO_BYTE_MULTIPLIER_ISTANBUL
+    } else {
+        NON_ZERO_BYTE_MULTIPLIER
+    };
+    zero_data_len + non_zero_data_len * non_zero_data_multiplier
+}
+
+/// Calculate the transaction cost floor as specified in EIP-7623.
+#[inline]
+pub fn calc_tx_floor_cost(tokens_in_calldata: u64) -> u64 {
+    tokens_in_calldata * TOTAL_COST_FLOOR_PER_TOKEN + 21_000
 }

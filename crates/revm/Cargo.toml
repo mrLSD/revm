@@ -36,7 +36,7 @@ handler.workspace = true
 handler-interface.workspace = true
 
 # Optional
-# TODO check if needed.
+# TODO : Check if needed.
 # serde = { version = "1.0", default-features = false, features = [
 #     "derive",
 #     "rc",
@@ -49,7 +49,6 @@ alloy-sol-types = { version = "0.8.2", default-features = false, features = [
 ] }
 ethers-contract = { version = "2.0.14", default-features = false }
 anyhow = "1.0.89"
-criterion = "0.5"
 indicatif = "0.17"
 reqwest = { version = "0.12" }
 rstest = "0.22.0"
@@ -82,12 +81,12 @@ dev = [
     "optional_gas_refund",
     "optional_no_base_fee",
 ]
-memory_limit = ["context-interface/memory_limit", "interpreter/memory_limit"]
-optional_balance_check = ["context-interface/optional_balance_check"]
-optional_block_gas_limit = ["context-interface/optional_block_gas_limit"]
-optional_eip3607 = ["context-interface/optional_eip3607"]
-optional_gas_refund = ["context-interface/optional_gas_refund"]
-optional_no_base_fee = ["context-interface/optional_no_base_fee"]
+memory_limit = ["context/memory_limit", "interpreter/memory_limit"]
+optional_balance_check = ["context/optional_balance_check"]
+optional_block_gas_limit = ["context/optional_block_gas_limit"]
+optional_eip3607 = ["context/optional_eip3607"]
+optional_gas_refund = ["context/optional_gas_refund"]
+optional_no_base_fee = ["context/optional_no_base_fee"]
 
 # See comments in `precompile`
 secp256k1 = ["precompile/secp256k1"]

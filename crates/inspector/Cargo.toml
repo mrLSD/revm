@@ -27,7 +27,6 @@ revm.workspace = true
 
 # mics
 auto_impl.workspace = true
-derive-where.workspace = true
 
 # Optional
 serde = { version = "1.0", default-features = false, features = [
@@ -44,7 +43,7 @@ database = { workspace = true, features = ["serde"] }
 
 [features]
 default = ["std"]
-# Preserve ordeder of json
+# Preserve order of json field
 std = ["serde?/std", "serde_json?/std", "serde_json?/preserve_order"]
 serde = ["dep:serde", "revm/serde", "database/serde"]
 serde-json = ["serde", "dep:serde_json"]
