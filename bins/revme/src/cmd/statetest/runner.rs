@@ -137,6 +137,30 @@ fn check_evm_execution<EXT>(
     let logs_root = log_rlp_hash(exec_result.as_ref().map(|r| r.logs()).unwrap_or_default());
     let state_root = state_merkle_trie_root(evm.context.evm.db.cache.trie_account());
 
+    // TODOFEE start - EVM results
+    println!("\n\n\t██████████ FINAL NOTES: {test_name}");
+    println!("actual_hash: {state_root:?}");
+    println!(
+        "gas_used: {}",
+        exec_result
+            .as_ref()
+            .ok()
+            .map(|r| r.gas_used())
+            .unwrap_or_default(),
+    );
+    for (addr, acc) in &evm.context.evm.db.cache.accounts {
+        if let Some(acc) = &acc.account {
+            println!("{addr:?}:");
+            let info = acc.info.clone();
+            println!("    balance: {:?}", info.balance.to_string());
+            println!("    code: {:?}", info.code);
+            println!("    nonce: {:?}", info.nonce);
+            println!("    storage: {:#?}", acc.storage);
+        }
+    }
+    println!("████==> RESULT: {exec_result:?}");
+    // TODOFEE end
+
     let print_json_output = |error: Option<String>| {
         if print_json_outcome {
             let json = json!({
