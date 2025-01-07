@@ -151,6 +151,8 @@ pub fn apply_eip7702_auth_list<SPEC: Spec, EXT, DB: Database>(
         if authorization.nonce() != authority_acc.info.nonce {
             continue;
         }
+        // TODOFEE
+        println!("AUTH [6] {:?} => {:?}", authority, authorization.address());
 
         // 7. Add `PER_EMPTY_ACCOUNT_COST - PER_AUTH_BASE_COST` gas to the global refund counter if `authority` exists in the trie.
         if !authority_acc.is_empty() {
@@ -172,10 +174,14 @@ pub fn apply_eip7702_auth_list<SPEC: Spec, EXT, DB: Database>(
         // 9. Increase the nonce of `authority` by one.
         authority_acc.info.nonce = authority_acc.info.nonce.saturating_add(1);
         authority_acc.mark_touch();
+        // TODOFEE
+        println!("PASS")
     }
 
     let refunded_gas =
         refunded_accounts * (eip7702::PER_EMPTY_ACCOUNT_COST - eip7702::PER_AUTH_BASE_COST);
+    // TODOFEE
+    println!("refunded_accounts: {refunded_accounts}");
 
     Ok(refunded_gas)
 }

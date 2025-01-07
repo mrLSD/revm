@@ -17,6 +17,15 @@ pub fn state_merkle_trie_root<'a>(
     accounts: impl IntoIterator<Item = (Address, &'a PlainAccount)>,
 ) -> B256 {
     trie_root(accounts.into_iter().map(|(address, acc)| {
+        // TODOFEE start
+        let _t = TrieAccount::new(acc);
+        let s: Vec<_> = acc.storage.iter().filter(|(_k, &v)| !v.is_zero()).collect();
+        println!("@TRIE {address:?}:");
+        for (k, v) in s {
+            println!("  {k:?}: {:X?}", v.to_be_bytes::<32>());
+        }
+        println!("");
+        // TODOFEE end
         (
             address,
             alloy_rlp::encode_fixed_size(&TrieAccount::new(acc)),

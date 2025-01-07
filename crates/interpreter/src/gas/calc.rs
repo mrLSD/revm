@@ -202,6 +202,8 @@ pub fn sstore_cost(spec_id: SpecId, vals: &SStoreResult, gas: u64, is_cold: bool
         if is_cold {
             gas_cost += COLD_SLOAD_COST;
         }
+        // TODOFEE
+        println!("=====> SSTORE_COST {gas_cost} [{is_cold}]");
         Some(gas_cost)
     } else if spec_id.is_enabled_in(SpecId::ISTANBUL) {
         // Istanbul logic

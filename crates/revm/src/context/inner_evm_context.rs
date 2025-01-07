@@ -183,6 +183,8 @@ impl<DB: Database> InnerEvmContext<DB> {
         let code = if code.is_eof() {
             EOF_MAGIC_BYTES.clone()
         } else if code.is_eip7702() {
+            // TODOFEE
+            println!("## CODE (auth ): {address:?}");
             EIP7702_MAGIC_BYTES.clone()
         } else {
             code.original_bytes()
@@ -204,9 +206,15 @@ impl<DB: Database> InnerEvmContext<DB> {
         // SAFETY: safe to unwrap as load_code will insert code if it is empty.
         let code = acc.info.code.as_ref().unwrap();
 
+        // TODOFEE
+        println!("### code_hash for: {address:?}");
         let hash = if code.is_eof() {
             EOF_MAGIC_HASH
         } else if code.is_eip7702() {
+            // TODOFEE
+            let is_cold = acc.is_cold;
+            println!("### code_hash delegated: {address:?} [{is_cold}]");
+
             EIP7702_MAGIC_HASH
         } else {
             acc.info.code_hash
