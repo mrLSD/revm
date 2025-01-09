@@ -150,16 +150,20 @@ fn check_evm_execution<EXT>(
     );
     for (addr, acc) in &evm.context.evm.db.cache.accounts {
         if let Some(acc) = &acc.account {
+            println!("----------------------");
             println!("{addr:?}:");
             let info = acc.info.clone();
             println!("    balance: {:?}", info.balance.to_string());
             println!("    code: {:?}", info.code);
             println!("    nonce: {:?}", info.nonce);
-            println!("    storage: {:#?}", acc.storage);
+            println!("    storage:");
+            for (i, s) in acc.storage.clone() {
+                println!("    {:?}: {:?}", i, B256::from(s));
+            }
         }
     }
-    println!("████==> RESULT: {exec_result:?}");
     // TODOFEE end
+    println!("████==> RESULT: {exec_result:?}");
 
     let print_json_output = |error: Option<String>| {
         if print_json_outcome {
@@ -279,7 +283,7 @@ pub fn execute_test_suite(
 
     for (name, unit) in suite.0 {
         // TODOFEE
-        // if name != "tests/prague/eip7702_set_code_tx/test_set_code_txs.py::test_contract_creating_set_code_transaction[fork_Prague-state_test]" {
+        // if name != "tests/prague/eip7702_set_code_tx/test_set_code_txs.py::test_delegation_clearing[fork_Prague-state_test-delegated_account-not_self_sponsored]" {
         //     continue;
         // }
 

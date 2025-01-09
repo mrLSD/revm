@@ -227,7 +227,6 @@ impl<DB: Database> EvmContext<DB> {
             .inner
             .journaled_state
             .load_code(inputs.bytecode_address, &mut self.inner.db)?;
-
         let code_hash = account.info.code_hash();
         let mut bytecode = account.info.code.clone().unwrap_or_default();
 

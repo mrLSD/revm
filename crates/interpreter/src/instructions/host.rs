@@ -46,6 +46,8 @@ pub fn extcodesize<H: Host + ?Sized, SPEC: Spec>(interpreter: &mut Interpreter, 
         interpreter.instruction_result = InstructionResult::FatalExternalError;
         return;
     };
+    // TODOFEE
+    println!("# CODE_SIZE for {address:?}: {}", code.len());
     if SPEC::enabled(BERLIN) {
         gas!(interpreter, warm_cold_cost(code.is_cold));
     } else if SPEC::enabled(TANGERINE) {
@@ -72,6 +74,8 @@ pub fn extcodehash<H: Host + ?Sized, SPEC: Spec>(interpreter: &mut Interpreter, 
     } else {
         gas!(interpreter, 400);
     }
+    // TODOFEE
+    println!("## HASH: {}", code_hash.data.to_string());
     push_b256!(interpreter, *code_hash);
 }
 
@@ -128,6 +132,8 @@ pub fn sstore<H: Host + ?Sized, SPEC: Spec>(interpreter: &mut Interpreter, host:
     require_non_staticcall!(interpreter);
 
     pop!(interpreter, index, value);
+    // TODOFEE
+    println!("{index}: {:?}", B256::from(value));
     let Some(state_load) = host.sstore(interpreter.contract.target_address, index, value) else {
         interpreter.instruction_result = InstructionResult::FatalExternalError;
         return;
