@@ -384,6 +384,8 @@ impl<EXT, DB: Database> Evm<'_, EXT, DB> {
         // spend at least a gas_floor amount of gas.
         let gas_result = result.gas_mut();
         if gas_result.spent() < gas.floor_gas {
+            // TODOFEE - gas_floor
+            println!("███   ███   ███ gas_floor: {} - {:?} | {eip7702_gas_refund}", gas.floor_gas, gas_result.spent());
             let _ = gas_result.record_cost(gas.floor_gas - gas_result.spent());
         }
 
