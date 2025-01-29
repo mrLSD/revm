@@ -9,7 +9,7 @@ use crate::{
         AccessListItem, Account, Address, AnalysisKind, Bytecode, Bytes, CfgEnv, EVMError, Env,
         Eof, HashSet, Spec,
         SpecId::{self, *},
-        B256, EIP7702_MAGIC_BYTES, EIP7702_MAGIC_HASH, EOF_MAGIC_BYTES, EOF_MAGIC_HASH, U256,
+        B256, EOF_MAGIC_BYTES, EOF_MAGIC_HASH, U256,
     },
     JournalCheckpoint,
 };
@@ -182,10 +182,6 @@ impl<DB: Database> InnerEvmContext<DB> {
 
         let code = if code.is_eof() {
             EOF_MAGIC_BYTES.clone()
-        } else if code.is_eip7702() {
-            // TODOFEE
-            println!("## CODE (auth ): {address:?}");
-            EIP7702_MAGIC_BYTES.clone()
         } else {
             code.original_bytes()
         };
@@ -210,12 +206,6 @@ impl<DB: Database> InnerEvmContext<DB> {
         println!("### code_hash for: {address:?}");
         let hash = if code.is_eof() {
             EOF_MAGIC_HASH
-        } else if code.is_eip7702() {
-            // TODOFEE
-            let is_cold = acc.is_cold;
-            println!("### code_hash delegated: {address:?} [{is_cold}]");
-
-            EIP7702_MAGIC_HASH
         } else {
             acc.info.code_hash
         };
