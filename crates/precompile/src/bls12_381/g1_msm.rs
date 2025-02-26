@@ -4,21 +4,22 @@ use super::{
     utils::{extract_scalar_input, NBITS, SCALAR_LENGTH},
 };
 use crate::{u64_to_address, PrecompileWithAddress};
+use crate::{PrecompileError, PrecompileOutput, PrecompileResult};
 use blst::{blst_p1, blst_p1_affine, blst_p1_from_affine, blst_p1_to_affine, p1_affines};
-use revm_primitives::{Bytes, Precompile, PrecompileError, PrecompileOutput, PrecompileResult};
+use primitives::Bytes;
 
 /// [EIP-2537](https://eips.ethereum.org/EIPS/eip-2537#specification) BLS12_G1MSM precompile.
 pub const PRECOMPILE: PrecompileWithAddress =
-    PrecompileWithAddress(u64_to_address(ADDRESS), Precompile::Standard(g1_msm));
+    PrecompileWithAddress(u64_to_address(ADDRESS), g1_msm);
 
 /// BLS12_G1MSM precompile address.
 pub const ADDRESS: u64 = 0x0c;
 
 /// Base gas fee for BLS12-381 g1_mul operation.
-pub(super) const BASE_GAS_FEE: u64 = 12000;
+pub const BASE_GAS_FEE: u64 = 12000;
 
 /// Input length of g1_mul operation.
-pub(super) const INPUT_LENGTH: usize = 160;
+pub const INPUT_LENGTH: usize = 160;
 
 /// Discounts table for G1 MSM as a vector of pairs `[k, discount]`.
 pub static DISCOUNT_TABLE: [u16; 128] = [
@@ -72,7 +73,7 @@ pub(super) fn g1_msm(input: &Bytes, gas_limit: u64) -> PrecompileResult {
         let p0_aff = &extract_g1_input(slice, true)?;
 
         let mut p0 = blst_p1::default();
-        // SAFETY: p0 and p0_aff are blst values.
+        // SAFETY: `p0` and `p0_aff` are blst values.
         unsafe { blst_p1_from_affine(&mut p0, p0_aff) };
         g1_points.push(p0);
 
@@ -85,7 +86,7 @@ pub(super) fn g1_msm(input: &Bytes, gas_limit: u64) -> PrecompileResult {
         );
     }
 
-    // return infinity point if all points are infinity
+    // Return infinity point if all points are infinity
     if g1_points.is_empty() {
         return Ok(PrecompileOutput::new(required_gas, [0; 128].into()));
     }
@@ -94,7 +95,7 @@ pub(super) fn g1_msm(input: &Bytes, gas_limit: u64) -> PrecompileResult {
     let multiexp = points.mult(&scalars, NBITS);
 
     let mut multiexp_aff = blst_p1_affine::default();
-    // SAFETY: multiexp_aff and multiexp are blst values.
+    // SAFETY: `multiexp_aff` and `multiexp` are blst values.
     unsafe { blst_p1_to_affine(&mut multiexp_aff, &multiexp) };
 
     let out = encode_g1_point(&multiexp_aff);

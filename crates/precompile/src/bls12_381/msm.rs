@@ -1,9 +1,10 @@
-/// Amount used to calculate the multi-scalar-multiplication discount.
+/// Amount used to calculate the multi-scalar-multiplication discount
 const MSM_MULTIPLIER: u64 = 1000;
 
 /// Implements the gas schedule for G1/G2 Multiscalar-multiplication assuming 30
 /// MGas/second, see also: <https://eips.ethereum.org/EIPS/eip-2537#g1g2-multiexponentiation>
-pub(crate) fn msm_required_gas(k: usize, discount_table: &[u16], multiplication_cost: u64) -> u64 {
+#[inline]
+pub fn msm_required_gas(k: usize, discount_table: &[u16], multiplication_cost: u64) -> u64 {
     if k == 0 {
         return 0;
     }

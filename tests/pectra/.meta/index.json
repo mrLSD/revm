@@ -36936,224 +36936,224 @@
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/double_auth.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0xa0b641936e25818e76caa11574f1c7b26281ba3e64941f70c33c9eb4fd19d3ae",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0x72ae3a9e64211eeedae94e1ccea7f35476c1531e062bed04b40e7ca60279186a",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0xf92ee6db706bbb766607ab3cbe9c9a20dd99304b3f6b82fe2965170c409fe3e2",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0x97bd9e5f6441bbde5fa411dd4775cbc23bf031e7cc93fa26120876608329f6bc",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0x328d7407b82adf6b97531bb5301e7f8cc066f43680892507e6ef7f33f6dcf1b4",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0x10d89bb7c1fe5cfe3cc3a8d21aa41666182bb3b8fa202391876d2c43d5a79964",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0x12428e4c0ccf41ed08e47dddd00ff5572894de9bd1c34137d9b2e0b46ff6bda5",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0xae4a68b6293735aeafc7a4b13024bf5dd169801c9176631950788f113146f5b0",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0x596fce859b0423408d32c424c05d8418beb5280f880d3706809aaae9bf1e1e23",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0x655152b9ee84516996b63ab3e6f2b1fbfadfcf8f62f65787a3f9274b52f203d1",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0x96e02d0131f981d1bd434ce87472e7c3936b744a6251a35673f9efbda410e5a8",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0x184f95bcac2e32eca14a51346cd8004bb0d96ae082e13a9c2ae2435b54525a1b",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0xa87fc9f35980b69976a03c6776cffd4320a2fcc802087993c4dad032d323bd75",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0x18b38decff4647d895b7782a0de0573bdc453bd97a8a44a039eba7015a3b0a9d",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0xca3ec6a346bf76462549fc48f3904b0274b5a80c82c8bcb880155277eba8634f",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0x7a467fa055f35eedcc09213286cd68b80b163f0ddead57bf5885e65b2210e4a4",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0x8dd6ed963a0396980db64834d52bb461a0be6594e6eeb923dcfa59997d80060c",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0x72ae3a9e64211eeedae94e1ccea7f35476c1531e062bed04b40e7ca60279186a",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0x806d03e24509e59eaf17aedb500b3d2a9ebec8268becd6bfaa3c993f03b59694",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0x97bd9e5f6441bbde5fa411dd4775cbc23bf031e7cc93fa26120876608329f6bc",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0x3c0493d5654421a46d792a7a335416d2a45b1219c281545fa17bb041c6bbf119",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0x10d89bb7c1fe5cfe3cc3a8d21aa41666182bb3b8fa202391876d2c43d5a79964",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0x47385e1f4939d529e354e213aa8a9185da2a2e301cb9f3c154c9a616827a55f9",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0xae4a68b6293735aeafc7a4b13024bf5dd169801c9176631950788f113146f5b0",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0xaf47f8c652f346821ef49f146d189a9cfe25384ab318095e5b4859b14a5165c8",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0x655152b9ee84516996b63ab3e6f2b1fbfadfcf8f62f65787a3f9274b52f203d1",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0x920e748492cda88d2ca9d36f0c80543ca196b548e48cc7f865b98c1b345a4017",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0x184f95bcac2e32eca14a51346cd8004bb0d96ae082e13a9c2ae2435b54525a1b",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0x660df6c650e865e9d300272b0cb4c1deba115c5bbbeafa14da90aebda1ee8e29",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0x18b38decff4647d895b7782a0de0573bdc453bd97a8a44a039eba7015a3b0a9d",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0x5dfd77c592a8dce37618ffaf9e0d7def33f1c3426c000c232f19f6795193dd19",
       "fork": "Prague",
       "format": "blockchain_test",
       "json_path": "blockchain_tests/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0x7a467fa055f35eedcc09213286cd68b80b163f0ddead57bf5885e65b2210e4a4",
       "fork": "Prague",
       "format": "blockchain_test",
@@ -133893,224 +133893,224 @@
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/double_auth.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0xb29b3da346c9801cb22e6b8c53ac64b8d5d051650052a60e48706b0737d5bd4d",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0x12463eba8a65c61f74aac0b90c15389d227af226b7e1b244ad1e00cef6b7a765",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0xfb93df0ac3f877403a0a6335fca595c6c0dc027ba196a867cc72ce1a0817429e",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0xb39325665c706cb764dd5bbe1d8ed6670a4aee5361244173bfef3925ea3e6dc2",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0x7236fe4ac39aa50e23dca76cff46281f320ccf88bbaf67443694dc6ee2d7831c",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0xe3be86df335cbe6606d1265fcfd0f28177fe4a470c03eb4baedd6b23c81ff243",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0xeae996a07ea87fe2ac59c2b420d7077c3a579e3f1dcb9dda18d9cb397d806b8e",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0x2e3c6f8f27c00fca4e9a509337bd0adab0189ee73acd7159de21aacf87979d9b",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0x4f79a3d22c114e25a0a11ac50e9d6798fafa1cba2a93adc0300177015a17028d",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0xb5dbf19d4e595fa26aa683d2854604e58fc964a1a6317906b9e94436d610e2a8",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0xd88d4d047cb4ed724ed2ffd8af7b2a9223a613088abc32cbb7f474174a954910",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0xd6911b83e8ede80f5c90a39f5a7c162ee4f9045a7e4fe83e1135d1ae0352c537",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0x59f34051a1a248705e2a28f4e904b0a37bad44ff4f3575a6bba40a6629135655",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0xeaefad6156bdebfa54c0be5a9053438749a3a21e0e375af476f587bc9679772e",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0xb114a2109301a6cf8989ebbe4e836ec36b0221b21723325dc61a961228a41b1f",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.CONTRACT_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0x2da375829123ff7ca211f0818d00e16d65b55f1ff32191c89356a08d4e1df761",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0x5743150497ad414b2f01b2ca6684a9644c151df79f507bab637aa95503708368",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0x12463eba8a65c61f74aac0b90c15389d227af226b7e1b244ad1e00cef6b7a765",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0x66ba16a1d3f2e2cff23fc721009f3b84ccb26850ff0b3f80c53d7e9ccec38157",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_BOTH_TX-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0xb39325665c706cb764dd5bbe1d8ed6670a4aee5361244173bfef3925ea3e6dc2",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0x2331c303e71920fa7a79c31a40a643b473ac2c3dcd5d6138ffff4d51d4c46e3c",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0xe3be86df335cbe6606d1265fcfd0f28177fe4a470c03eb4baedd6b23c81ff243",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0xc5df1a6fe34882f960f3f744a4bedffac0585be6cb7b989cc0151306cfae5516",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_NORMAL_TX_ONLY-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0x2e3c6f8f27c00fca4e9a509337bd0adab0189ee73acd7159de21aacf87979d9b",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0xdb18a6c393cd479fbbc68e4d4c5dfd894d1f9df45b5961237f934ae75d4cd3a3",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0xb5dbf19d4e595fa26aa683d2854604e58fc964a1a6317906b9e94436d610e2a8",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0x840fe5ec52e2a3dd6edcda902634c1cedfc28e42998dd216146fc94d3a5b5a20",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.IN_POINTER_TX_ONLY-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0xd6911b83e8ede80f5c90a39f5a7c162ee4f9045a7e4fe83e1135d1ae0352c537",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_BOTH_TX]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_BOTH_TX]",
       "fixture_hash": "0x31e6c2b50ba6ce8c9a3a06ca6a0478aa3b4703099b46874b3a7fd9ef8dcac6b1",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_NORMAL_TX_ONLY]",
       "fixture_hash": "0xeaefad6156bdebfa54c0be5a9053438749a3a21e0e375af476f587bc9679772e",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.IN_POINTER_TX_ONLY]",
       "fixture_hash": "0xf3f2b0395e24225777c7480ac71b8ad4f217c4d30a3a23f14f3d4bb8c0d70d16",
       "fork": "Prague",
       "format": "blockchain_test_engine",
       "json_path": "blockchain_tests_engine/prague/eip7702_set_code_tx/set_code_txs_2/gas_diff_pointer_vs_direct_call.json"
     },
     {
-      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTo.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.NONE]",
+      "id": "tests/prague/eip7702_set_code_tx/test_set_code_txs_2.py::test_gas_diff_pointer_vs_direct_call[fork_Prague-blockchain_test_engine-access_list_to_AccessListTro.POINTER_ADDRESS-pointer_definition_PointerDefinition.SEPARATE-access_list_rule_AccessListCall.NONE]",
       "fixture_hash": "0x2da375829123ff7ca211f0818d00e16d65b55f1ff32191c89356a08d4e1df761",
       "fork": "Prague",
       "format": "blockchain_test_engine",

@@ -6,6 +6,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [16.0.0](https://github.com/bluealloy/revm/compare/revm-interpreter-v15.2.0...revm-interpreter-v16.0.0-alpha.1) - 2025-02-16
+
+### Added
+
+- Evm structure (Cached Instructions and Precompiles) (#2049)
+- Add essential EIP-7756 tracing fields (#2023)
+- Context execution (#2013)
+- EthHandler trait (#2001)
+- *(EIP-7623)* adjuct floor gas check order (main) (#1991)
+- *(eip7702)* apply latest EIP-7702 changes, backport from v52 (#1969)
+- *(EIP-7623)* Increase calldata cost. backport from rel/v51 (#1965)
+- simplify Transaction trait (#1959)
+- align Block trait (#1957)
+- Make Ctx journal generic (#1933)
+- Restucturing Part7 Handler and Context rework (#1865)
+- *(interpreter)* impl Clone for Stack (#1820)
+- restructuring Part6 transaction crate (#1814)
+- Merge validation/analyzis with Bytecode (#1793)
+- restructure Part2 database crate (#1784)
+- project restructuring Part1 (#1776)
+- introducing EvmWiring, a chain-specific configuration (#1672)
+
+### Fixed
+
+- make macro crate-agnostic (#1802)
+
+### Other
+
+- backport op l1 fetch perf (#2076)
+- add default generics for InterpreterTypes (#2070)
+- Check performance of gas with i64 [#1884](https://github.com/bluealloy/revm/pull/1884) ([#2062](https://github.com/bluealloy/revm/pull/2062))
+- Bump licence year to 2025 (#2058)
+- relax halt reason bounds (#2041)
+- remove duplicate instructions (#2029)
+- align crates versions (#1983)
+- Add bytecode hash in interpreter [#1888](https://github.com/bluealloy/revm/pull/1888) ([#1952](https://github.com/bluealloy/revm/pull/1952))
+- Make inspector use generics, rm associated types (#1934)
+- use MemoryOOG (#1941)
+- fix comments and docs into more sensible (#1920)
+- Move CfgEnv from context-interface to context crate (#1910)
+- implement serde for interpreter ([#1909](https://github.com/bluealloy/revm/pull/1909))
+- make ExtBytecode pointer private (#1904)
+- fix typos (#1868)
+- *(primitives)* replace HashMap re-exports with alloy_primitives::map (#1805)
+- refactor -copy common code (#1799)
+- add ReentrancySentryOOG for SSTORE (#1795)
+- simplify SuccessOrHalt trait bound (#1768)
+
 ## [15.2.0](https://github.com/bluealloy/revm/compare/revm-interpreter-v15.1.0...revm-interpreter-v15.2.0) - 2025-02-11
 
 ### Other
@@ -184,7 +232,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - parse opcodes from strings ([#1358](https://github.com/bluealloy/revm/pull/1358))
 - *(interpreter)* add helpers for spending all gas ([#1360](https://github.com/bluealloy/revm/pull/1360))
 - add helper methods to CallInputs ([#1345](https://github.com/bluealloy/revm/pull/1345))
-- *(revm)* make `FrameOrResult` serializable ([#1282](https://github.com/bluealloy/revm/pull/1282))
+- *(revm)* make `ItemOrResult` serializable ([#1282](https://github.com/bluealloy/revm/pull/1282))
 - add flag to force hashbrown usage ([#1284](https://github.com/bluealloy/revm/pull/1284))
 - EOF (Ethereum Object Format) ([#1143](https://github.com/bluealloy/revm/pull/1143))
 - *(interpreter)* derive Eq for InterpreterAction ([#1262](https://github.com/bluealloy/revm/pull/1262))

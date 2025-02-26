@@ -4,21 +4,22 @@ use super::{
     utils::{extract_scalar_input, NBITS, SCALAR_LENGTH},
 };
 use crate::{u64_to_address, PrecompileWithAddress};
+use crate::{PrecompileError, PrecompileOutput, PrecompileResult};
 use blst::{blst_p2, blst_p2_affine, blst_p2_from_affine, blst_p2_to_affine, p2_affines};
-use revm_primitives::{Bytes, Precompile, PrecompileError, PrecompileOutput, PrecompileResult};
+use primitives::Bytes;
 
 /// [EIP-2537](https://eips.ethereum.org/EIPS/eip-2537#specification) BLS12_G2MSM precompile.
 pub const PRECOMPILE: PrecompileWithAddress =
-    PrecompileWithAddress(u64_to_address(ADDRESS), Precompile::Standard(g2_msm));
+    PrecompileWithAddress(u64_to_address(ADDRESS), g2_msm);
 
 /// BLS12_G2MSM precompile address.
 pub const ADDRESS: u64 = 0x0e;
 
 /// Base gas fee for BLS12-381 g2_mul operation.
-pub(super) const BASE_GAS_FEE: u64 = 22500;
+pub const BASE_GAS_FEE: u64 = 22500;
 
 /// Input length of g2_mul operation.
-pub(super) const INPUT_LENGTH: usize = 288;
+pub const INPUT_LENGTH: usize = 288;
 
 // Discounts table for G2 MSM as a vector of pairs `[k, discount]`:
 pub static DISCOUNT_TABLE: [u16; 128] = [
@@ -71,7 +72,7 @@ pub(super) fn g2_msm(input: &Bytes, gas_limit: u64) -> PrecompileResult {
         let p0_aff = &extract_g2_input(slice, true)?;
 
         let mut p0 = blst_p2::default();
-        // SAFETY: p0 and p0_aff are blst values.
+        // SAFETY: `p0` and `p0_aff` are blst values.
         unsafe { blst_p2_from_affine(&mut p0, p0_aff) };
 
         g2_points.push(p0);
@@ -85,7 +86,7 @@ pub(super) fn g2_msm(input: &Bytes, gas_limit: u64) -> PrecompileResult {
         );
     }
 
-    // return infinity point if all points are infinity
+    // Return infinity point if all points are infinity
     if g2_points.is_empty() {
         return Ok(PrecompileOutput::new(required_gas, [0; 256].into()));
     }
@@ -94,7 +95,7 @@ pub(super) fn g2_msm(input: &Bytes, gas_limit: u64) -> PrecompileResult {
     let multiexp = points.mult(&scalars, NBITS);
 
     let mut multiexp_aff = blst_p2_affine::default();
-    // SAFETY: multiexp_aff and multiexp are blst values.
+    // SAFETY: `multiexp_aff` and `multiexp` are blst values.
     unsafe { blst_p2_to_affine(&mut multiexp_aff, &multiexp) };
 
     let out = encode_g2_point(&multiexp_aff);
