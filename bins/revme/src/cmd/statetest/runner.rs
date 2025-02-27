@@ -156,7 +156,7 @@ fn check_evm_execution(
             .map(|r| r.gas_used())
             .unwrap_or_default(),
     );
-    for (addr, acc) in &evm.context.evm.db.cache.accounts {
+    for (addr, acc) in &db.cache.accounts {
         if let Some(acc) = &acc.account {
             println!("----------------------");
             println!("{addr:?}:");
@@ -280,14 +280,14 @@ pub fn execute_test_suite(
     })?;
 
     for (name, unit) in suite.0 {
-        // TODOFEE
-        // if name != "tests/prague/eip7623_increase_calldata_cost/test_execution_gas.py::TestGasRefunds::test_gas_refunds_from_data_floor[fork_Prague-state_test-exact_gas-type_0_protected]" {
-        //     continue;
-        // }
-
         // Create database and insert cache
         let mut cache_state = database::CacheState::new(false);
         for (address, info) in unit.pre {
+            // TODOFEE
+            // if name != "tests/prague/eip7623_increase_calldata_cost/test_execution_gas.py::TestGasRefunds::test_gas_refunds_from_data_floor[fork_Prague-state_test-exact_gas-type_0_protected]" {
+            //     continue;
+            // }
+
             let code_hash = keccak256(&info.code);
             let bytecode = Bytecode::new_raw_checked(info.code.clone())
                 .unwrap_or(Bytecode::new_legacy(info.code));
