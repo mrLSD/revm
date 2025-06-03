@@ -163,6 +163,8 @@ pub fn apply_eip7702_auth_list<
         // 9. Increase the nonce of `authority` by one.
         authority_acc.info.nonce = authority_acc.info.nonce.saturating_add(1);
         authority_acc.mark_touch();
+        // TODOFEE
+        println!("AUTH: {authority_acc:?}");
     }
 
     let refunded_gas =

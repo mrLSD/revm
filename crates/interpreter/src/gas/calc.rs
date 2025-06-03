@@ -405,6 +405,7 @@ pub fn calculate_initial_tx_gas(
 
         // Calculate gas floor for EIP-7623
         gas.floor_gas = calc_tx_floor_cost(tokens_in_calldata);
+        println!("-- gas.floor_gas: {}"```);
     }
 
     gas

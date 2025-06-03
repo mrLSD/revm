@@ -446,6 +446,7 @@ impl<DB: Database> JournaledState<DB> {
         &mut self,
         address: Address,
     ) -> Result<StateLoad<B256>, <DB as Database>::Error> {
+        println!("-- code_hash for: {address}");
         let acc = self.load_account_code(address)?;
         if acc.is_empty() {
             return Ok(StateLoad::new(B256::ZERO, acc.is_cold));
@@ -458,6 +459,7 @@ impl<DB: Database> JournaledState<DB> {
         } else {
             acc.info.code_hash
         };
+        println!("-- hash: {acc:#?}");
 
         Ok(StateLoad::new(hash, acc.is_cold))
     }

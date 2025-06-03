@@ -130,6 +130,8 @@ impl Gas {
     /// Set a spent value. This overrides the current spent value.
     #[inline]
     pub fn set_spent(&mut self, spent: u64) {
+        // TODOFEE
+        println!("## set_spent: -{}", spent);
         self.remaining = self.limit.saturating_sub(spent);
     }
 
