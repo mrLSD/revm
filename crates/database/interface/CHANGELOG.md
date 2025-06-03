@@ -7,6 +7,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.1](https://github.com/bluealloy/revm/compare/revm-database-interface-v4.0.0...revm-database-interface-v4.0.1) - 2025-05-22
+
+### Other
+
+- make crates.io version badge clickable ([#2526](https://github.com/bluealloy/revm/pull/2526))
+- Storage Types Alias ([#2461](https://github.com/bluealloy/revm/pull/2461))
+
+## [4.0.0](https://github.com/bluealloy/revm/compare/revm-database-interface-v3.0.1...revm-database-interface-v4.0.0) - 2025-05-07
+
+Dependency bump
+
+## [3.0.1](https://github.com/bluealloy/revm/compare/revm-database-interface-v3.0.0...revm-database-interface-v3.0.1) - 2025-05-07
+
+### Other
+
+- copy edit The Book ([#2463](https://github.com/bluealloy/revm/pull/2463))
+- bump dependency version ([#2431](https://github.com/bluealloy/revm/pull/2431))
+- fixed broken link ([#2421](https://github.com/bluealloy/revm/pull/2421))
+- remove alloy-sol-types deps ([#2411](https://github.com/bluealloy/revm/pull/2411))
+
+## [3.0.0](https://github.com/bluealloy/revm/compare/revm-database-interface-v2.0.0...revm-database-interface-v3.0.0) - 2025-04-09
+
+### Other
+
+- clean unsed indicatif ([#2379](https://github.com/bluealloy/revm/pull/2379))
+- add 0x prefix to b256! and address! calls ([#2345](https://github.com/bluealloy/revm/pull/2345))
+
+## [2.0.0](https://github.com/bluealloy/revm/compare/revm-database-interface-v1.0.0...revm-database-interface-v2.0.0) - 2025-03-28
+
+### Other
+
+- Propagate asyncdb feature flag from database-interface to revm  ([#2310](https://github.com/bluealloy/revm/pull/2310))
+
+## [1.0.0](https://github.com/bluealloy/revm/compare/revm-database-interface-v1.0.0-alpha.54...revm-database-interface-v1.0.0) - 2025-03-24
+
+Stable version
+
+## [1.0.0-alpha.5](https://github.com/bluealloy/revm/compare/revm-database-interface-v1.0.0-alpha.4...revm-database-interface-v1.0.0-alpha.5) - 2025-03-21
+
+### Other
+
+- updated the following local packages: revm-primitives
+
+## [1.0.0-alpha.4](https://github.com/bluealloy/revm/compare/revm-database-interface-v1.0.0-alpha.3...revm-database-interface-v1.0.0-alpha.4) - 2025-03-16
+
+### Other
+
+- updated the following local packages: revm-primitives
+
+## [1.0.0-alpha.3](https://github.com/bluealloy/revm/compare/revm-database-interface-v1.0.0-alpha.2...revm-database-interface-v1.0.0-alpha.3) - 2025-03-11
+
+### Fixed
+
+- remove wrong Clone Macro in WrapDatabaseRef ([#2181](https://github.com/bluealloy/revm/pull/2181))
+- correct propagate features ([#2177](https://github.com/bluealloy/revm/pull/2177))
+
+## [1.0.0-alpha.2](https://github.com/bluealloy/revm/compare/revm-database-interface-v1.0.0-alpha.1...revm-database-interface-v1.0.0-alpha.2) - 2025-03-10
+
+### Added
+
+- TryDatabaseCommit ([#2121](https://github.com/bluealloy/revm/pull/2121))
+
+### Other
+
+- move all dependencies to workspace ([#2092](https://github.com/bluealloy/revm/pull/2092))
+
 ## [1.0.0-alpha.1](https://github.com/bluealloy/revm/releases/tag/revm-database-interface-v1.0.0-alpha.1) - 2025-02-16
 
 ### Added

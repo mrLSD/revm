@@ -1,13 +1,19 @@
 use crate::Context;
 use auto_impl::auto_impl;
-use context_interface::{Block, Cfg, Database, Journal, Transaction};
+use context_interface::{Block, Cfg, Database, JournalTr, Transaction};
 
+/// Setters for the context.
 #[auto_impl(&mut, Box)]
 pub trait ContextSetters {
+    /// Transaction type.
     type Tx: Transaction;
+    /// Block type.
     type Block: Block;
 
+    /// Set the transaction.
     fn set_tx(&mut self, tx: Self::Tx);
+
+    /// Set the block.
     fn set_block(&mut self, block: Self::Block);
 }
 
@@ -18,7 +24,7 @@ where
     TX: Transaction,
     CFG: Cfg,
     DB: Database,
-    JOURNAL: Journal<Database = DB>,
+    JOURNAL: JournalTr<Database = DB>,
 {
     type Tx = TX;
     type Block = BLOCK;

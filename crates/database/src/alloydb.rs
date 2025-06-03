@@ -1,15 +1,12 @@
 pub use alloy_eips::BlockId;
 use alloy_provider::{
-    network::{
-        primitives::{BlockTransactionsKind, HeaderResponse},
-        BlockResponse,
-    },
+    network::{primitives::HeaderResponse, BlockResponse},
     Network, Provider,
 };
-use alloy_transport::{Transport, TransportError};
+use alloy_transport::TransportError;
 use core::error::Error;
 use database_interface::{async_db::DatabaseAsyncRef, DBErrorMarker};
-use primitives::{Address, B256, U256};
+use primitives::{Address, StorageKey, StorageValue, B256};
 use state::{AccountInfo, Bytecode};
 use std::fmt::Display;
 
@@ -36,15 +33,15 @@ impl From<TransportError> for DBTransportError {
 ///
 /// When accessing the database, it'll use the given provider to fetch the corresponding account's data.
 #[derive(Debug)]
-pub struct AlloyDB<T: Transport + Clone, N: Network, P: Provider<T, N>> {
+pub struct AlloyDB<N: Network, P: Provider<N>> {
     /// The provider to fetch the data from.
     provider: P,
     /// The block number on which the queries will be based on.
     block_number: BlockId,
-    _marker: core::marker::PhantomData<fn() -> (T, N)>,
+    _marker: core::marker::PhantomData<fn() -> N>,
 }
 
-impl<T: Transport + Clone, N: Network, P: Provider<T, N>> AlloyDB<T, N, P> {
+impl<N: Network, P: Provider<N>> AlloyDB<N, P> {
     /// Creates a new AlloyDB instance, with a [Provider] and a block.
     pub fn new(provider: P, block_number: BlockId) -> Self {
         Self {
@@ -60,7 +57,7 @@ impl<T: Transport + Clone, N: Network, P: Provider<T, N>> AlloyDB<T, N, P> {
     }
 }
 
-impl<T: Transport + Clone, N: Network, P: Provider<T, N>> DatabaseAsyncRef for AlloyDB<T, N, P> {
+impl<N: Network, P: Provider<N>> DatabaseAsyncRef for AlloyDB<N, P> {
     type Error = DBTransportError;
 
     async fn basic_async_ref(&self, address: Address) -> Result<Option<AccountInfo>, Self::Error> {
@@ -91,7 +88,7 @@ impl<T: Transport + Clone, N: Network, P: Provider<T, N>> DatabaseAsyncRef for A
         let block = self
             .provider
             // SAFETY: We know number <= u64::MAX, so we can safely convert it to u64
-            .get_block_by_number(number.into(), BlockTransactionsKind::Hashes)
+            .get_block_by_number(number.into())
             .await?;
         // SAFETY: If the number is given, the block is supposed to be finalized, so unwrapping is safe.
         Ok(B256::new(*block.unwrap().header().hash()))
@@ -102,7 +99,11 @@ impl<T: Transport + Clone, N: Network, P: Provider<T, N>> DatabaseAsyncRef for A
         // This is not needed, as the code is already loaded with basic_ref
     }
 
-    async fn storage_async_ref(&self, address: Address, index: U256) -> Result<U256, Self::Error> {
+    async fn storage_async_ref(
+        &self,
+        address: Address,
+        index: StorageKey,
+    ) -> Result<StorageValue, Self::Error> {
         Ok(self
             .provider
             .get_storage_at(address, index)
@@ -120,7 +121,7 @@ mod tests {
     #[test]
     #[ignore = "flaky RPC"]
     fn can_get_basic() {
-        let client = ProviderBuilder::new().on_http(
+        let client = ProviderBuilder::new().connect_http(
             "https://mainnet.infura.io/v3/c60b0bb42f8a4c6481ecd229eddaca27"
                 .parse()
                 .unwrap(),

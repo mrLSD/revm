@@ -1,3 +1,10 @@
+//! Module that contains the bytecode enum with all variants supported by Ethereum mainnet.
+//!
+//! Those are:
+//! - Legacy bytecode with jump table analysis. Found in [`LegacyAnalyzedBytecode`]
+//! - EOF ( EMV Object Format) bytecode introduced in Osaka that.
+//! - EIP-7702 bytecode, introduces in Prague and contains address to delegated account.
+
 use crate::{
     eip7702::{Eip7702Bytecode, EIP7702_MAGIC_BYTES},
     BytecodeDecodeError, Eof, JumpTable, LegacyAnalyzedBytecode, LegacyRawBytecode,
@@ -7,7 +14,7 @@ use core::fmt::Debug;
 use primitives::{keccak256, Address, Bytes, B256, KECCAK_EMPTY};
 use std::sync::Arc;
 
-/// State of the [`Bytecode`] analysis
+/// Main bytecode structure with all variants.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Bytecode {
@@ -81,7 +88,7 @@ impl Bytecode {
     ///
     /// # Panics
     ///
-    /// Panics if bytecode is in incorrect format.
+    /// Panics if bytecode is in incorrect format. If you want to handle errors use [`Self::new_raw_checked`].
     #[inline]
     pub fn new_raw(bytecode: Bytes) -> Self {
         Self::new_raw_checked(bytecode).expect("Expect correct EOF bytecode")
@@ -114,15 +121,10 @@ impl Bytecode {
 
     /// Create new checked bytecode.
     ///
-    /// # Safety
+    /// # Panics
     ///
-    /// Bytecode needs to end with `STOP` (`0x00`) opcode as checked bytecode assumes
-    /// that it is safe to iterate over bytecode without checking lengths.
-    pub unsafe fn new_analyzed(
-        bytecode: Bytes,
-        original_len: usize,
-        jump_table: JumpTable,
-    ) -> Self {
+    /// For possible panics see [`LegacyAnalyzedBytecode::new`].
+    pub fn new_analyzed(bytecode: Bytes, original_len: usize, jump_table: JumpTable) -> Self {
         Self::LegacyAnalyzed(LegacyAnalyzedBytecode::new(
             bytecode,
             original_len,
@@ -156,7 +158,7 @@ impl Bytecode {
         self.bytes_ref().clone()
     }
 
-    /// Returns bytes.
+    /// Returns raw bytes reference.
     #[inline]
     pub fn bytes_ref(&self) -> &Bytes {
         match self {
@@ -166,13 +168,13 @@ impl Bytecode {
         }
     }
 
-    /// Returns bytes slice.
+    /// Returns raw bytes slice.
     #[inline]
     pub fn bytes_slice(&self) -> &[u8] {
         self.bytes_ref()
     }
 
-    /// Returns a reference to the original bytecode.
+    /// Returns the original bytecode.
     #[inline]
     pub fn original_bytes(&self) -> Bytes {
         match self {
@@ -202,6 +204,13 @@ impl Bytecode {
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
+    }
+
+    /// Returns an iterator over the opcodes in this bytecode, skipping immediates.
+    /// This is useful if you want to ignore immediates and just see what opcodes are inside.
+    #[inline]
+    pub fn iter_opcodes(&self) -> crate::BytecodeIterator<'_> {
+        crate::BytecodeIterator::new(self)
     }
 }
 

@@ -1,4 +1,4 @@
-use super::{Eof, EofDecodeError, EofHeader, TypesSection};
+use super::{CodeInfo, Eof, EofDecodeError, EofHeader};
 use primitives::Bytes;
 use std::vec::Vec;
 
@@ -11,13 +11,24 @@ use std::vec::Vec;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EofBody {
     /// Code information
-    pub types_section: Vec<TypesSection>,
+    pub code_info: Vec<CodeInfo>,
     /// Index of the last byte of each code section
     pub code_section: Vec<usize>,
+    /// Code byte, it is a concatenation of all code sections.
+    /// Interpreter uses this bytecode to execute the opcodes.
     pub code: Bytes,
+    /// Offset of the code section in the bytecode.
     pub code_offset: usize,
+    /// Container sections
     pub container_section: Vec<Bytes>,
+    /// Data section
     pub data_section: Bytes,
+    /// Indicates if the data section is filled.
+    ///
+    /// Unfilled data section are used in EOFCREATE/TXCREATE to
+    /// append data before deploying that contract to state.
+    ///
+    /// EOF containers that are in state and can be executed are required to have filled data section.
     pub is_data_filled: bool,
 }
 
@@ -37,7 +48,7 @@ impl EofBody {
     pub fn into_eof(self) -> Eof {
         let mut prev_value = 0;
         let header = EofHeader {
-            types_size: self.types_section.len() as u16 * 4,
+            types_size: self.code_info.len() as u16 * 4,
             code_sizes: self
                 .code_section
                 .iter()
@@ -50,7 +61,7 @@ impl EofBody {
             container_sizes: self
                 .container_section
                 .iter()
-                .map(|x| x.len() as u16)
+                .map(|x| x.len() as u32)
                 .collect(),
             data_size: self.data_section.len() as u16,
             sum_code_sizes: self.code.len(),
@@ -76,8 +87,8 @@ impl EofBody {
 
     /// Encodes this body into the given buffer.
     pub fn encode(&self, buffer: &mut Vec<u8>) {
-        for types_section in &self.types_section {
-            types_section.encode(buffer);
+        for code_info in &self.code_info {
+            code_info.encode(buffer);
         }
 
         buffer.extend_from_slice(&self.code);
@@ -92,15 +103,17 @@ impl EofBody {
     /// Decodes an EOF container body from the given buffer and header.
     pub fn decode(input: &Bytes, header: &EofHeader) -> Result<Self, EofDecodeError> {
         let header_len = header.size();
-        let partial_body_len =
-            header.sum_code_sizes + header.sum_container_sizes + header.types_size as usize;
-        let full_body_len = partial_body_len + header.data_size as usize;
+        let partial_body_len = header
+            .sum_code_sizes
+            .saturating_add(header.sum_container_sizes)
+            .saturating_add(header.types_size as usize);
+        let full_body_len = partial_body_len.saturating_add(header.data_size as usize);
 
-        if input.len() < header_len + partial_body_len {
+        if input.len() < header_len.saturating_add(partial_body_len) {
             return Err(EofDecodeError::MissingBodyWithoutData);
         }
 
-        if input.len() > header_len + full_body_len {
+        if input.len() > header_len.saturating_add(full_body_len) {
             return Err(EofDecodeError::DanglingData);
         }
 
@@ -108,9 +121,9 @@ impl EofBody {
 
         let mut types_input = &input[header_len..];
         for _ in 0..header.types_count() {
-            let (types_section, local_input) = TypesSection::decode(types_input)?;
+            let (code_info, local_input) = CodeInfo::decode(types_input)?;
             types_input = local_input;
-            body.types_section.push(types_section);
+            body.code_info.push(code_info);
         }
 
         // Extract code section

@@ -5,7 +5,82 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [4.0.0](https://github.com/bluealloy/revm/compare/revm-state-v3.0.1...revm-state-v4.0.0) - 2025-05-07
+
+Dependency bump
+
 ## [Unreleased]
+
+## [4.0.1](https://github.com/bluealloy/revm/compare/revm-state-v4.0.0...revm-state-v4.0.1) - 2025-05-22
+
+### Other
+
+- make crates.io version badge clickable ([#2526](https://github.com/bluealloy/revm/pull/2526))
+- Storage Types Alias ([#2461](https://github.com/bluealloy/revm/pull/2461))
+
+## [3.0.1](https://github.com/bluealloy/revm/compare/revm-state-v3.0.0...revm-state-v3.0.1) - 2025-05-07
+
+Yanked release
+
+### Other
+
+- copy edit The Book ([#2463](https://github.com/bluealloy/revm/pull/2463))
+- cache and use JumpTable::default ([#2439](https://github.com/bluealloy/revm/pull/2439))
+- bump dependency version ([#2431](https://github.com/bluealloy/revm/pull/2431))
+- add AccountInfo setters ([#2429](https://github.com/bluealloy/revm/pull/2429))
+- fixed broken link ([#2421](https://github.com/bluealloy/revm/pull/2421))
+- *(lints)* revm-context lints ([#2404](https://github.com/bluealloy/revm/pull/2404))
+
+## [3.0.0](https://github.com/bluealloy/revm/compare/revm-state-v2.0.0...revm-state-v3.0.0) - 2025-04-09
+
+### Added
+
+- Account helper builder functions ([#2355](https://github.com/bluealloy/revm/pull/2355))
+- support for system calls ([#2350](https://github.com/bluealloy/revm/pull/2350))
+
+### Other
+
+- *(state)* Add AccountInfo builder util methods ([#2357](https://github.com/bluealloy/revm/pull/2357))
+
+## [2.0.0](https://github.com/bluealloy/revm/compare/revm-state-v1.0.0...revm-state-v2.0.0) - 2025-03-28
+
+### Other
+
+- updated the following local packages: revm-primitives, revm-bytecode
+
+## [1.0.0](https://github.com/bluealloy/revm/compare/revm-state-v1.0.0-alpha.4...revm-state-v1.0.0) - 2025-03-24
+
+Stable version
+
+## [1.0.0-alpha.5](https://github.com/bluealloy/revm/compare/revm-state-v1.0.0-alpha.4...revm-state-v1.0.0-alpha.5) - 2025-03-21
+
+### Other
+
+- updated the following local packages: revm-primitives
+
+## [1.0.0-alpha.4](https://github.com/bluealloy/revm/compare/revm-state-v1.0.0-alpha.3...revm-state-v1.0.0-alpha.4) - 2025-03-16
+
+### Other
+
+- updated the following local packages: revm-primitives, revm-bytecode
+
+## [1.0.0-alpha.3](https://github.com/bluealloy/revm/compare/revm-state-v1.0.0-alpha.2...revm-state-v1.0.0-alpha.3) - 2025-03-11
+
+### Fixed
+
+- correct propagate features ([#2177](https://github.com/bluealloy/revm/pull/2177))
+
+## [1.0.0-alpha.2](https://github.com/bluealloy/revm/compare/revm-state-v1.0.0-alpha.1...revm-state-v1.0.0-alpha.2) - 2025-03-10
+
+### Added
+
+- remove specification crate ([#2165](https://github.com/bluealloy/revm/pull/2165))
+
+### Other
+
+- docs and cleanup (rm Custom Inst) ([#2151](https://github.com/bluealloy/revm/pull/2151))
+- move all dependencies to workspace ([#2092](https://github.com/bluealloy/revm/pull/2092))
 
 ## [1.0.0-alpha.1](https://github.com/bluealloy/revm/releases/tag/revm-state-v1.0.0-alpha.1) - 2025-02-16
 

@@ -1,32 +1,35 @@
 use super::frame_data::*;
 use crate::{
-    handler::EvmTr, instructions::InstructionProvider, precompile_provider::PrecompileProvider,
+    instructions::InstructionProvider, precompile_provider::PrecompileProvider, EvmTr,
     FrameInitOrResult, FrameOrResult, ItemOrResult,
 };
 use bytecode::{Eof, EOF_MAGIC_BYTES};
+use context::result::FromStringError;
+use context::LocalContextTr;
+use context_interface::context::ContextError;
 use context_interface::ContextTr;
 use context_interface::{
-    journaled_state::{Journal, JournalCheckpoint},
+    journaled_state::{JournalCheckpoint, JournalTr},
     Cfg, Database, Transaction,
 };
-use core::{cell::RefCell, cmp::min};
+use core::cmp::min;
 use interpreter::{
     gas,
     interpreter::{EthInterpreter, ExtBytecode},
     interpreter_types::{LoopControl, ReturnData, RuntimeFlag},
-    return_ok, return_revert, CallInputs, CallOutcome, CallValue, CreateInputs, CreateOutcome,
-    CreateScheme, EOFCreateInputs, EOFCreateKind, FrameInput, Gas, InputsImpl, InstructionResult,
-    Interpreter, InterpreterAction, InterpreterResult, InterpreterTypes, SharedMemory,
+    return_ok, return_revert, CallInput, CallInputs, CallOutcome, CallValue, CreateInputs,
+    CreateOutcome, CreateScheme, EOFCreateInputs, EOFCreateKind, FrameInput, Gas, InputsImpl,
+    InstructionResult, Interpreter, InterpreterAction, InterpreterResult, InterpreterTypes,
+    SharedMemory,
 };
-use precompile::PrecompileErrors;
-use primitives::{keccak256, Address, Bytes, B256, U256};
-use specification::{
+use primitives::{
     constants::CALL_STACK_LIMIT,
-    hardfork::SpecId::{self, HOMESTEAD, LONDON, OSAKA, SPURIOUS_DRAGON},
+    hardfork::SpecId::{self, HOMESTEAD, LONDON, SPURIOUS_DRAGON},
 };
+use primitives::{keccak256, Address, Bytes, B256, U256};
 use state::Bytecode;
 use std::borrow::ToOwned;
-use std::{boxed::Box, rc::Rc, sync::Arc};
+use std::{boxed::Box, sync::Arc};
 
 /// Call frame trait
 pub trait Frame: Sized {
@@ -41,7 +44,7 @@ pub trait Frame: Sized {
     ) -> Result<FrameOrResult<Self>, Self::Error>;
 
     fn init(
-        &self,
+        &mut self,
         evm: &mut Self::Evm,
         frame_input: Self::FrameInit,
     ) -> Result<FrameOrResult<Self>, Self::Error>;
@@ -67,21 +70,18 @@ pub struct EthFrame<EVM, ERROR, IW: InterpreterTypes> {
     pub checkpoint: JournalCheckpoint,
     /// Interpreter.
     pub interpreter: Interpreter<IW>,
-    // This is worth making as a generic type FrameSharedContext.
-    pub memory: Rc<RefCell<SharedMemory>>,
 }
 
 impl<EVM, ERROR> Frame for EthFrame<EVM, ERROR, EthInterpreter>
 where
     EVM: EvmTr<
-        Precompiles: PrecompileProvider<Context = EVM::Context, Output = InterpreterResult>,
+        Precompiles: PrecompileProvider<EVM::Context, Output = InterpreterResult>,
         Instructions: InstructionProvider<
             Context = EVM::Context,
             InterpreterTypes = EthInterpreter,
-            Output = InterpreterAction,
         >,
     >,
-    ERROR: From<ContextTrDbError<EVM::Context>> + From<PrecompileErrors>,
+    ERROR: From<ContextTrDbError<EVM::Context>> + FromStringError,
 {
     type Evm = EVM;
     type FrameInit = FrameInput;
@@ -92,15 +92,19 @@ where
         evm: &mut Self::Evm,
         frame_input: Self::FrameInit,
     ) -> Result<FrameOrResult<Self>, Self::Error> {
-        EthFrame::init_first(evm, frame_input)
+        let memory =
+            SharedMemory::new_with_buffer(evm.ctx().local().shared_memory_buffer().clone());
+        Self::init_with_context(evm, 0, frame_input, memory)
     }
 
     fn init(
-        &self,
+        &mut self,
         evm: &mut Self::Evm,
         frame_input: Self::FrameInit,
     ) -> Result<FrameOrResult<Self>, Self::Error> {
-        self.init(evm, frame_input)
+        // Create new context from shared memory.
+        let memory = self.interpreter.memory.new_child_context();
+        EthFrame::init_with_context(evm, self.depth + 1, frame_input, memory)
     }
 
     fn run(&mut self, context: &mut Self::Evm) -> Result<FrameInitOrResult<Self>, Self::Error> {
@@ -129,7 +133,6 @@ where
         depth: usize,
         interpreter: Interpreter<IW>,
         checkpoint: JournalCheckpoint,
-        memory: Rc<RefCell<SharedMemory>>,
     ) -> Self {
         Self {
             phantom: Default::default(),
@@ -138,7 +141,6 @@ where
             depth,
             interpreter,
             checkpoint,
-            memory,
         }
     }
 }
@@ -147,17 +149,18 @@ impl<EVM, ERROR> EthFrame<EVM, ERROR, EthInterpreter>
 where
     EVM: EvmTr<
         Context: ContextTr,
-        Precompiles: PrecompileProvider<Context = EVM::Context, Output = InterpreterResult>,
+        Precompiles: PrecompileProvider<EVM::Context, Output = InterpreterResult>,
         Instructions: InstructionProvider,
     >,
-    ERROR: From<ContextTrDbError<EVM::Context>> + From<PrecompileErrors>,
+    ERROR: From<ContextTrDbError<EVM::Context>>,
+    ERROR: FromStringError,
 {
     /// Make call frame
     #[inline]
     pub fn make_call_frame(
         evm: &mut EVM,
         depth: usize,
-        memory: Rc<RefCell<SharedMemory>>,
+        memory: SharedMemory,
         inputs: Box<CallInputs>,
     ) -> Result<ItemOrResult<Self, FrameResult>, ERROR> {
         let gas = Gas::new(inputs.gas_limit);
@@ -195,20 +198,35 @@ where
             if let Some(i) =
                 context
                     .journal()
-                    .transfer(&inputs.caller, &inputs.target_address, value)?
+                    .transfer(inputs.caller, inputs.target_address, value)?
             {
                 context.journal().checkpoint_revert(checkpoint);
                 return return_result(i.into());
             }
         }
+
+        let interpreter_input = InputsImpl {
+            target_address: inputs.target_address,
+            caller_address: inputs.caller,
+            bytecode_address: Some(inputs.bytecode_address),
+            input: inputs.input.clone(),
+            call_value: inputs.value.get(),
+        };
+        let is_static = inputs.is_static;
+        let gas_limit = inputs.gas_limit;
+
         let is_ext_delegate_call = inputs.scheme.is_ext_delegate_call();
         if !is_ext_delegate_call {
-            if let Some(result) = precompiles.run(
-                context,
-                &inputs.bytecode_address,
-                &inputs.input,
-                inputs.gas_limit,
-            )? {
+            if let Some(result) = precompiles
+                .run(
+                    context,
+                    &inputs.bytecode_address,
+                    &interpreter_input,
+                    is_static,
+                    gas_limit,
+                )
+                .map_err(ERROR::from_string)?
+            {
                 if result.result.is_ok() {
                     context.journal().checkpoint_commit();
                 } else {
@@ -228,17 +246,6 @@ where
         let mut code_hash = account.info.code_hash();
         let mut bytecode = account.info.code.clone().unwrap_or_default();
 
-        // ExtDelegateCall is not allowed to call non-EOF contracts.
-        if is_ext_delegate_call && !bytecode.bytes_slice().starts_with(&EOF_MAGIC_BYTES) {
-            context.journal().checkpoint_revert(checkpoint);
-            return return_result(InstructionResult::InvalidExtDelegateCallTarget);
-        }
-
-        if bytecode.is_empty() {
-            context.journal().checkpoint_commit();
-            return return_result(InstructionResult::Stop);
-        }
-
         if let Bytecode::Eip7702(eip7702_bytecode) = bytecode {
             let account = &context
                 .journal()
@@ -248,15 +255,19 @@ where
             code_hash = account.code_hash();
         }
 
+        // ExtDelegateCall is not allowed to call non-EOF contracts.
+        if is_ext_delegate_call && !bytecode.bytes_slice().starts_with(&EOF_MAGIC_BYTES) {
+            context.journal().checkpoint_revert(checkpoint);
+            return return_result(InstructionResult::InvalidExtDelegateCallTarget);
+        }
+
+        // Returns success if bytecode is empty.
+        if bytecode.is_empty() {
+            context.journal().checkpoint_commit();
+            return return_result(InstructionResult::Stop);
+        }
+
         // Create interpreter and executes call and push new CallStackFrame.
-        let interpreter_input = InputsImpl {
-            target_address: inputs.target_address,
-            caller_address: inputs.caller,
-            input: inputs.input.clone(),
-            call_value: inputs.value.get(),
-        };
-        let is_static = inputs.is_static;
-        let gas_limit = inputs.gas_limit;
         Ok(ItemOrResult::Item(Self::new(
             FrameData::Call(CallFrame {
                 return_memory_range: inputs.return_memory_offset.clone(),
@@ -264,7 +275,7 @@ where
             FrameInput::Call(inputs),
             depth,
             Interpreter::new(
-                memory.clone(),
+                memory,
                 ExtBytecode::new_with_hash(bytecode, code_hash),
                 interpreter_input,
                 is_static,
@@ -273,7 +284,6 @@ where
                 gas_limit,
             ),
             checkpoint,
-            memory,
         )))
     }
 
@@ -282,7 +292,7 @@ where
     pub fn make_create_frame(
         evm: &mut EVM,
         depth: usize,
-        memory: Rc<RefCell<SharedMemory>>,
+        memory: SharedMemory,
         inputs: Box<CreateInputs>,
     ) -> Result<ItemOrResult<Self, FrameResult>, ERROR> {
         let context = evm.ctx();
@@ -304,18 +314,21 @@ where
         }
 
         // Prague EOF
-        if spec.is_enabled_in(OSAKA) && inputs.init_code.starts_with(&EOF_MAGIC_BYTES) {
-            return return_error(InstructionResult::CreateInitCodeStartingEF00);
-        }
+        // TODO(EOF)
+        // if spec.is_enabled_in(OSAKA) && inputs.init_code.starts_with(&EOF_MAGIC_BYTES) {
+        //     return return_error(InstructionResult::CreateInitCodeStartingEF00);
+        // }
 
         // Fetch balance of caller.
         let caller_balance = context
             .journal()
             .load_account(inputs.caller)?
-            .map(|a| a.info.balance);
+            .data
+            .info
+            .balance;
 
         // Check if caller has enough balance to send to the created contract.
-        if caller_balance.data < inputs.value {
+        if caller_balance < inputs.value {
             return return_error(InstructionResult::OutOfFunds);
         }
 
@@ -335,6 +348,7 @@ where
                 init_code_hash = keccak256(&inputs.init_code);
                 inputs.caller.create2(salt.to_be_bytes(), init_code_hash)
             }
+            CreateScheme::Custom { address } => address,
         };
 
         // warm load account.
@@ -359,16 +373,18 @@ where
         let interpreter_input = InputsImpl {
             target_address: created_address,
             caller_address: inputs.caller,
-            input: Bytes::new(),
+            bytecode_address: None,
+            input: CallInput::Bytes(Bytes::new()),
             call_value: inputs.value,
         };
         let gas_limit = inputs.gas_limit;
+
         Ok(ItemOrResult::Item(Self::new(
             FrameData::Create(CreateFrame { created_address }),
             FrameInput::Create(inputs),
             depth,
             Interpreter::new(
-                memory.clone(),
+                memory,
                 bytecode,
                 interpreter_input,
                 false,
@@ -377,7 +393,6 @@ where
                 gas_limit,
             ),
             checkpoint,
-            memory,
         )))
     }
 
@@ -386,7 +401,7 @@ where
     pub fn make_eofcreate_frame(
         evm: &mut EVM,
         depth: usize,
-        memory: Rc<RefCell<SharedMemory>>,
+        memory: SharedMemory,
         inputs: Box<EOFCreateInputs>,
     ) -> Result<ItemOrResult<Self, FrameResult>, ERROR> {
         let context = evm.ctx();
@@ -428,7 +443,7 @@ where
                 let tx = context.tx();
                 let create_address = tx.caller().create(tx.nonce());
 
-                (input, eof, Some(create_address))
+                (CallInput::Bytes(input), Arc::new(eof), Some(create_address))
             }
         };
 
@@ -474,6 +489,7 @@ where
         let interpreter_input = InputsImpl {
             target_address: created_address,
             caller_address: inputs.caller,
+            bytecode_address: None,
             input,
             call_value: inputs.value,
         };
@@ -484,8 +500,8 @@ where
             FrameInput::EOFCreate(inputs),
             depth,
             Interpreter::new(
-                memory.clone(),
-                ExtBytecode::new(Bytecode::Eof(Arc::new(initcode))),
+                memory,
+                ExtBytecode::new(Bytecode::Eof(initcode)),
                 interpreter_input,
                 false,
                 true,
@@ -493,7 +509,6 @@ where
                 gas_limit,
             ),
             checkpoint,
-            memory,
         )))
     }
 
@@ -501,7 +516,7 @@ where
         evm: &mut EVM,
         depth: usize,
         frame_init: FrameInput,
-        memory: Rc<RefCell<SharedMemory>>,
+        memory: SharedMemory,
     ) -> Result<ItemOrResult<Self, FrameResult>, ERROR> {
         match frame_init {
             FrameInput::Call(inputs) => Self::make_call_frame(evm, depth, memory, inputs),
@@ -515,39 +530,14 @@ impl<EVM, ERROR> EthFrame<EVM, ERROR, EthInterpreter>
 where
     EVM: EvmTr<
         Context: ContextTr,
-        Precompiles: PrecompileProvider<Context = EVM::Context, Output = InterpreterResult>,
+        Precompiles: PrecompileProvider<EVM::Context, Output = InterpreterResult>,
         Instructions: InstructionProvider<
             Context = EVM::Context,
             InterpreterTypes = EthInterpreter,
-            Output = InterpreterAction,
         >,
     >,
-    ERROR: From<ContextTrDbError<EVM::Context>> + From<PrecompileErrors>,
+    ERROR: From<ContextTrDbError<EVM::Context>> + FromStringError,
 {
-    pub fn init_first(
-        evm: &mut EVM,
-        frame_input: FrameInput,
-    ) -> Result<ItemOrResult<Self, FrameResult>, ERROR> {
-        let memory = Rc::new(RefCell::new(SharedMemory::new()));
-        let (context, precompiles) = evm.ctx_precompiles();
-        precompiles.set_spec(context.cfg().spec());
-        context
-            .journal()
-            .warm_precompiles(precompiles.warm_addresses().collect());
-
-        memory.borrow_mut().new_context();
-        Self::init_with_context(evm, 0, frame_input, memory)
-    }
-
-    fn init(
-        &self,
-        evm: &mut EVM,
-        frame_init: FrameInput,
-    ) -> Result<ItemOrResult<Self, FrameResult>, ERROR> {
-        self.memory.borrow_mut().new_context();
-        Self::init_with_context(evm, self.depth + 1, frame_init, self.memory.clone())
-    }
-
     pub fn process_next_action(
         &mut self,
         evm: &mut EVM,
@@ -616,8 +606,12 @@ where
     }
 
     fn return_result(&mut self, evm: &mut EVM, result: FrameResult) -> Result<(), ERROR> {
-        self.memory.borrow_mut().free_context();
-        core::mem::replace(evm.ctx().error(), Ok(()))?;
+        self.interpreter.memory.free_child_context();
+        match core::mem::replace(evm.ctx().error(), Ok(())) {
+            Err(ContextError::Db(e)) => return Err(e.into()),
+            Err(ContextError::Custom(e)) => return Err(ERROR::from_string(e)),
+            Ok(_) => (),
+        }
 
         // Insert result to the top frame.
         match result {
@@ -629,7 +623,7 @@ where
                 let interpreter = &mut self.interpreter;
                 let mem_length = outcome.memory_length();
                 let mem_start = outcome.memory_start();
-                *interpreter.return_data.buffer_mut() = outcome.result.output;
+                interpreter.return_data.set_buffer(outcome.result.output);
 
                 let target_len = min(mem_length, returned_len);
 
@@ -655,27 +649,34 @@ where
 
                 // Return unspend gas.
                 if ins_result.is_ok_or_revert() {
-                    interpreter.control.gas().erase_cost(out_gas.remaining());
-                    self.memory
-                        .borrow_mut()
+                    interpreter
+                        .control
+                        .gas_mut()
+                        .erase_cost(out_gas.remaining());
+                    interpreter
+                        .memory
                         .set(mem_start, &interpreter.return_data.buffer()[..target_len]);
                 }
 
                 if ins_result.is_ok() {
-                    interpreter.control.gas().record_refund(out_gas.refunded());
+                    interpreter
+                        .control
+                        .gas_mut()
+                        .record_refund(out_gas.refunded());
                 }
             }
             FrameResult::Create(outcome) => {
                 let instruction_result = *outcome.instruction_result();
                 let interpreter = &mut self.interpreter;
 
-                let buffer = interpreter.return_data.buffer_mut();
                 if instruction_result == InstructionResult::Revert {
                     // Save data to return data buffer if the create reverted
-                    *buffer = outcome.output().to_owned()
+                    interpreter
+                        .return_data
+                        .set_buffer(outcome.output().to_owned());
                 } else {
                     // Otherwise clear it. Note that RETURN opcode should abort.
-                    buffer.clear();
+                    interpreter.return_data.clear();
                 };
 
                 assert_ne!(
@@ -684,7 +685,7 @@ where
                     "Fatal external error in insert_eofcreate_outcome"
                 );
 
-                let this_gas = interpreter.control.gas();
+                let this_gas = interpreter.control.gas_mut();
                 if instruction_result.is_ok_or_revert() {
                     this_gas.erase_cost(outcome.gas().remaining());
                 }
@@ -704,10 +705,12 @@ where
                 let interpreter = &mut self.interpreter;
                 if instruction_result == InstructionResult::Revert {
                     // Save data to return data buffer if the create reverted
-                    *interpreter.return_data.buffer_mut() = outcome.output().to_owned()
+                    interpreter
+                        .return_data
+                        .set_buffer(outcome.output().to_owned());
                 } else {
                     // Otherwise clear it. Note that RETURN opcode should abort.
-                    interpreter.return_data.buffer_mut().clear();
+                    interpreter.return_data.clear()
                 };
 
                 assert_ne!(
@@ -716,7 +719,7 @@ where
                     "Fatal external error in insert_eofcreate_outcome"
                 );
 
-                let this_gas = interpreter.control.gas();
+                let this_gas = interpreter.control.gas_mut();
                 if instruction_result.is_ok_or_revert() {
                     this_gas.erase_cost(outcome.gas().remaining());
                 }
@@ -737,7 +740,7 @@ where
     }
 }
 
-pub fn return_create<JOURNAL: Journal>(
+pub fn return_create<JOURNAL: JournalTr>(
     journal: &mut JOURNAL,
     checkpoint: JournalCheckpoint,
     interpreter_result: &mut InterpreterResult,
@@ -793,7 +796,7 @@ pub fn return_create<JOURNAL: Journal>(
     interpreter_result.result = InstructionResult::Return;
 }
 
-pub fn return_eofcreate<JOURNAL: Journal>(
+pub fn return_eofcreate<JOURNAL: JournalTr>(
     journal: &mut JOURNAL,
     checkpoint: JournalCheckpoint,
     interpreter_result: &mut InterpreterResult,

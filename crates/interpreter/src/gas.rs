@@ -49,13 +49,16 @@ impl Gas {
         self.limit
     }
 
-    /// Returns the **last** memory expansion cost.
+    /// Returns the memory gas.
     #[inline]
-    #[deprecated = "memory expansion cost is not tracked anymore; \
-                    calculate it using `SharedMemory::current_expansion_cost` instead"]
-    #[doc(hidden)]
-    pub const fn memory(&self) -> u64 {
-        0
+    pub fn memory(&self) -> &MemoryGas {
+        &self.memory
+    }
+
+    /// Returns the memory gas.
+    #[inline]
+    pub fn memory_mut(&mut self) -> &mut MemoryGas {
+        &mut self.memory
     }
 
     /// Returns the total amount of gas that was refunded.
@@ -174,7 +177,7 @@ pub enum MemoryExtensionResult {
     Extended,
     /// Memory size stayed the same.
     Same,
-    /// Not enough gas to extend memory.s
+    /// Not enough gas to extend memory.
     OutOfGas,
 }
 

@@ -1,22 +1,18 @@
 use crate::inspectors::GasInspector;
 use crate::Inspector;
-use revm::interpreter::interpreter_types::{RuntimeFlag, SubRoutineStack};
-use revm::{
-    bytecode::opcode::OpCode,
-    context::Cfg,
-    context_interface::{ContextTr, Journal, Transaction},
-    interpreter::{
-        interpreter_types::{Jumps, LoopControl, MemoryTr, StackTr},
-        CallInputs, CallOutcome, CreateInputs, CreateOutcome, Interpreter, InterpreterResult,
-        InterpreterTypes, Stack,
-    },
-    primitives::{hex, HashMap, B256, U256},
+use context::{Cfg, ContextTr, JournalTr, Transaction};
+use interpreter::{
+    interpreter_types::{Jumps, LoopControl, MemoryTr, RuntimeFlag, StackTr, SubRoutineStack},
+    CallInputs, CallOutcome, CreateInputs, CreateOutcome, EOFCreateInputs, Interpreter,
+    InterpreterResult, InterpreterTypes, Stack,
 };
+use primitives::{hex, HashMap, B256, U256};
 use serde::Serialize;
+use state::bytecode::opcode::OpCode;
 use std::io::Write;
 
 /// [EIP-3155](https://eips.ethereum.org/EIPS/eip-3155) tracer [Inspector].
-pub struct TracerEip3155<CTX, INTR> {
+pub struct TracerEip3155 {
     output: Box<dyn Write>,
     gas_inspector: GasInspector,
     /// Print summary of the execution.
@@ -32,7 +28,6 @@ pub struct TracerEip3155<CTX, INTR> {
     skip: bool,
     include_memory: bool,
     memory: Option<String>,
-    _phantom: core::marker::PhantomData<(CTX, INTR)>,
 }
 
 // # Output
@@ -112,15 +107,16 @@ struct Summary {
     fork: Option<String>,
 }
 
-impl<CTX, INTR> TracerEip3155<CTX, INTR>
-where
-    CTX: ContextTr,
-    INTR:,
-{
+impl TracerEip3155 {
     /// Creates a new EIP-3155 tracer with the given output writer, by first wrapping it in a
     /// [`BufWriter`](std::io::BufWriter).
     pub fn buffered(output: impl Write + 'static) -> Self {
         Self::new(Box::new(std::io::BufWriter::new(output)))
+    }
+
+    /// Creates a new EIP-3155 tracer with a stdout output.
+    pub fn new_stdout() -> Self {
+        Self::buffered(std::io::stdout())
     }
 
     /// Creates a new EIP-3155 tracer with the given output writer.
@@ -140,7 +136,6 @@ where
             refunded: 0,
             mem_size: 0,
             skip: false,
-            _phantom: Default::default(),
         }
     }
 
@@ -186,7 +181,7 @@ where
         *skip = false;
     }
 
-    fn print_summary(&mut self, result: &InterpreterResult, context: &mut CTX) {
+    fn print_summary(&mut self, result: &InterpreterResult, context: &mut impl ContextTr) {
         if !self.print_summary {
             return;
         }
@@ -218,7 +213,7 @@ impl CloneStack for Stack {
     }
 }
 
-impl<CTX, INTR> Inspector<CTX, INTR> for TracerEip3155<CTX, INTR>
+impl<CTX, INTR> Inspector<CTX, INTR> for TracerEip3155
 where
     CTX: ContextTr,
     INTR: InterpreterTypes<Stack: StackTr + CloneStack>,
@@ -256,7 +251,7 @@ where
     }
 
     fn step_end(&mut self, interp: &mut Interpreter<INTR>, context: &mut CTX) {
-        self.gas_inspector.step_end(interp.control.gas());
+        self.gas_inspector.step_end(interp.control.gas_mut());
         if self.skip {
             self.skip = false;
             return;
@@ -276,11 +271,8 @@ where
             mem_size: self.mem_size as u64,
 
             op_name: OpCode::new(self.opcode).map(|i| i.as_str()),
-            error: if !interp.control.instruction_result().is_ok() {
-                Some(format!("{:?}", interp.control.instruction_result()))
-            } else {
-                None
-            },
+            error: (!interp.control.instruction_result().is_ok())
+                .then(|| format!("{:?}", interp.control.instruction_result())),
             memory: self.memory.take(),
             storage: None,
             return_stack: None,
@@ -300,6 +292,22 @@ where
     }
 
     fn create_end(&mut self, context: &mut CTX, _: &CreateInputs, outcome: &mut CreateOutcome) {
+        self.gas_inspector.create_end(outcome);
+
+        if context.journal().depth() == 0 {
+            self.print_summary(&outcome.result, context);
+            let _ = self.output.flush();
+            // Clear the state if we are at the top level.
+            self.clear();
+        }
+    }
+
+    fn eofcreate_end(
+        &mut self,
+        context: &mut CTX,
+        _: &EOFCreateInputs,
+        outcome: &mut CreateOutcome,
+    ) {
         self.gas_inspector.create_end(outcome);
 
         if context.journal().depth() == 0 {

@@ -3,16 +3,16 @@
 
 use alloy_consensus::Transaction;
 use alloy_eips::{BlockId, BlockNumberOrTag};
-use alloy_provider::{
-    network::primitives::{BlockTransactions, BlockTransactionsKind},
-    Provider, ProviderBuilder,
-};
-use database::{AlloyDB, CacheDB, StateBuilder};
+use alloy_provider::{network::primitives::BlockTransactions, Provider, ProviderBuilder};
 use indicatif::ProgressBar;
-use inspector::{inspectors::TracerEip3155, InspectEvm};
 use revm::{
-    database_interface::WrapDatabaseAsync, primitives::TxKind, Context, MainBuilder, MainContext,
+    database::{AlloyDB, CacheDB, StateBuilder},
+    database_interface::WrapDatabaseAsync,
+    inspector::{inspectors::TracerEip3155, InspectEvm},
+    primitives::TxKind,
+    Context, MainBuilder, MainContext,
 };
+use std::fs::create_dir_all;
 use std::fs::OpenOptions;
 use std::io::BufWriter;
 use std::io::Write;
@@ -42,11 +42,13 @@ impl Write for FlushWriter {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    create_dir_all("traces")?;
+
     // Set up the HTTP transport which is consumed by the RPC client.
     let rpc_url = "https://mainnet.infura.io/v3/c60b0bb42f8a4c6481ecd229eddaca27".parse()?;
 
-    // Create ethers client and wrap it in Arc<M>
-    let client = ProviderBuilder::new().on_http(rpc_url);
+    // Create a provider
+    let client = ProviderBuilder::new().connect_http(rpc_url);
 
     // Params
     let chain_id: u64 = 1;
@@ -54,10 +56,8 @@ async fn main() -> anyhow::Result<()> {
 
     // Fetch the transaction-rich block
     let block = match client
-        .get_block_by_number(
-            BlockNumberOrTag::Number(block_number),
-            BlockTransactionsKind::Full,
-        )
+        .get_block_by_number(BlockNumberOrTag::Number(block_number))
+        .full()
         .await
     {
         Ok(Some(block)) => block,
@@ -116,7 +116,7 @@ async fn main() -> anyhow::Result<()> {
 
     for tx in transactions {
         evm.modify_tx(|etx| {
-            etx.caller = tx.from;
+            etx.caller = tx.inner.signer();
             etx.gas_limit = tx.gas_limit();
             etx.gas_price = tx.gas_price().unwrap_or(tx.inner.max_fee_per_gas());
             etx.value = tx.value();
@@ -150,7 +150,7 @@ async fn main() -> anyhow::Result<()> {
         let writer = FlushWriter::new(Arc::clone(&inner));
 
         // Inspect and commit the transaction to the EVM
-        let res = evm.inspect_previous_with_inspector(TracerEip3155::new(Box::new(writer)));
+        let res = evm.inspect_replay_with_inspector(TracerEip3155::new(Box::new(writer)));
 
         if let Err(error) = res {
             println!("Got error: {:?}", error);

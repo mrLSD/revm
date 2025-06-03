@@ -1,17 +1,17 @@
 
 # Contact
 
-Git repo can be found [https://github.com/bluealloy/revm/](https://github.com/bluealloy/revm/)
+The git repository can be found at [https://github.com/bluealloy/revm/](https://github.com/bluealloy/revm/)
 
-For questions please open github issue or join public telegram group: [https://t.me/+Ig4WDWOzikA3MzA0](https://t.me/+Ig4WDWOzikA3MzA0)
+For questions please open a github issue or join the public telegram group: [https://t.me/+Ig4WDWOzikA3MzA0](https://t.me/+Ig4WDWOzikA3MzA0)
 
 ### Licence
 
 Licensed under MIT Licence.
 
-unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in these crates by you, shall be licensed as above, without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in these crates by you, shall be licensed as above, without any additional terms or conditions.
 
 ### Security
 
-If there is security question/findings please contact me directly on email at`dragan0rakita@gmail.com` or on keybase [@draganrakita](https://keybase.io/draganrakita/).
+If there is a security question or finding please contact me directly via email at `dragan0rakita@gmail.com` or on keybase `@draganrakita`
 

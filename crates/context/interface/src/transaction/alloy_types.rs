@@ -1,14 +1,19 @@
-use super::{AccessListTr, AuthorizationTr};
+use super::{AccessListItemTr, AuthorizationTr};
+use either::{for_both, Either};
 use primitives::{Address, B256, U256};
 
-use alloy_eip2930::AccessList;
-use alloy_eip7702::{RecoveredAuthorization, SignedAuthorization};
+pub use alloy_eip2930::{AccessList, AccessListItem};
+pub use alloy_eip7702::{
+    Authorization, RecoveredAuthority, RecoveredAuthorization, SignedAuthorization,
+};
 
-impl AccessListTr for AccessList {
-    fn access_list(&self) -> impl Iterator<Item = (Address, impl Iterator<Item = B256>)> {
-        self.0
-            .iter()
-            .map(|item| (item.address, item.storage_keys.iter().cloned()))
+impl AccessListItemTr for AccessListItem {
+    fn address(&self) -> &Address {
+        &self.address
+    }
+
+    fn storage_slots(&self) -> impl Iterator<Item = &B256> {
+        self.storage_keys.iter()
     }
 }
 
@@ -45,5 +50,23 @@ impl AuthorizationTr for RecoveredAuthorization {
 
     fn address(&self) -> Address {
         self.address
+    }
+}
+
+impl<L: AuthorizationTr, R: AuthorizationTr> AuthorizationTr for Either<L, R> {
+    fn authority(&self) -> Option<Address> {
+        for_both!(self, s => s.authority())
+    }
+
+    fn chain_id(&self) -> U256 {
+        for_both!(self, s => s.chain_id())
+    }
+
+    fn nonce(&self) -> u64 {
+        for_both!(self, s => s.nonce())
+    }
+
+    fn address(&self) -> Address {
+        for_both!(self, s => s.address())
     }
 }

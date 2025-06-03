@@ -3,7 +3,7 @@ mod call_helpers;
 pub use call_helpers::{calc_call_gas, get_memory_input_and_out_ranges, resize_memory};
 
 use crate::{
-    gas::{self, cost_per_word, EOF_CREATE_GAS, KECCAK256WORD, MIN_CALLEE_GAS},
+    gas::{self, EOF_CREATE_GAS, MIN_CALLEE_GAS},
     instructions::utility::IntoAddress,
     interpreter::Interpreter,
     interpreter_action::FrameInput,
@@ -11,14 +11,13 @@ use crate::{
         EofContainer, Immediates, InputsTr, InterpreterTypes, Jumps, LoopControl, MemoryTr,
         ReturnData, RuntimeFlag, StackTr,
     },
-    CallInputs, CallScheme, CallValue, CreateInputs, EOFCreateInputs, Host, InstructionResult,
-    InterpreterAction, InterpreterResult,
+    CallInput, CallInputs, CallScheme, CallValue, CreateInputs, EOFCreateInputs, Host,
+    InstructionResult, InterpreterAction, InterpreterResult,
 };
 use bytecode::eof::{Eof, EofHeader};
-use context_interface::{Cfg, CreateScheme};
+use context_interface::CreateScheme;
 use core::cmp::max;
-use primitives::{keccak256, Address, Bytes, B256, U256};
-use specification::hardfork::SpecId;
+use primitives::{eof::new_eof_address, hardfork::SpecId, Address, Bytes, B256, U256};
 use std::boxed::Box;
 
 /// EOF Create instruction
@@ -31,7 +30,7 @@ pub fn eofcreate<WIRE: InterpreterTypes, H: Host + ?Sized>(
     gas!(interpreter, EOF_CREATE_GAS);
     let initcontainer_index = interpreter.bytecode.read_u8();
 
-    popn!([value, salt, data_offset, data_size], interpreter);
+    popn!([salt, input_offset, input_size, value], interpreter);
 
     let container = interpreter
         .bytecode
@@ -40,7 +39,7 @@ pub fn eofcreate<WIRE: InterpreterTypes, H: Host + ?Sized>(
         .clone();
 
     // Resize memory and get return range.
-    let Some(input_range) = resize_memory(interpreter, data_offset, data_size) else {
+    let Some(input_range) = resize_memory(interpreter, input_offset, input_size) else {
         return;
     };
 
@@ -57,17 +56,16 @@ pub fn eofcreate<WIRE: InterpreterTypes, H: Host + ?Sized>(
         panic!("Panic if data section is not full");
     }
 
-    // Deduct gas for hash that is needed to calculate address.
-    gas_or_fail!(interpreter, cost_per_word(container.len(), KECCAK256WORD));
-
-    let created_address = interpreter
-        .input
-        .target_address()
-        .create2(salt.to_be_bytes(), keccak256(container));
+    // Calculate new address
+    let created_address = new_eof_address(
+        interpreter.input.target_address(),
+        salt.to_be_bytes().into(),
+    );
 
     let gas_limit = interpreter.control.gas().remaining_63_of_64_parts();
     gas!(interpreter, gas_limit);
-    // Send container for execution container is preverified.
+
+    // Send container for execution as all deployed containers are preverified to be valid EOF.
     interpreter.control.set_next_action(
         InterpreterAction::NewFrame(FrameInput::EOFCreate(Box::new(
             EOFCreateInputs::new_opcode(
@@ -76,13 +74,78 @@ pub fn eofcreate<WIRE: InterpreterTypes, H: Host + ?Sized>(
                 value,
                 eof,
                 gas_limit,
-                input,
+                CallInput::Bytes(input),
             ),
         ))),
         InstructionResult::CallOrCreate,
     );
 
+    // jump over initcontainer index.
     interpreter.bytecode.relative_jump(1);
+}
+
+/// Instruction to create a new EOF contract from a transaction initcode.
+pub fn txcreate<WIRE: InterpreterTypes, H: Host + ?Sized>(
+    interpreter: &mut Interpreter<WIRE>,
+    host: &mut H,
+) {
+    // TODO(EOF) only accepted in EOF.
+    require_eof!(interpreter);
+    require_non_staticcall!(interpreter);
+    gas!(interpreter, EOF_CREATE_GAS);
+
+    // pop tx_initcode_hash, salt, input_offset, input_size, value from the operand stack
+    popn!(
+        [tx_initcode_hash, salt, input_offset, input_size, value],
+        interpreter
+    );
+    let tx_initcode_hash = B256::from(tx_initcode_hash);
+
+    // perform (and charge for) memory expansion using [input_offset, input_size]
+    let Some(input_range) = resize_memory(interpreter, input_offset, input_size) else {
+        return;
+    };
+
+    // Get validated initcode with all its subcontainers validated recursively.
+    let Some(initcode) = host.initcode_by_hash(tx_initcode_hash) else {
+        // If initcode is not found or not valid, push 0 on the stack.
+        push!(interpreter, U256::ZERO);
+        return;
+    };
+
+    // caller’s memory slice [input_offset:input_size] is used as calldata
+    let input = if !input_range.is_empty() {
+        interpreter.memory.slice(input_range).to_vec().into()
+    } else {
+        Bytes::new()
+    };
+
+    // Decode initcode as EOF.
+    let eof = Eof::decode(initcode).expect("Subcontainer is verified");
+
+    // Calculate new address
+    let created_address = new_eof_address(
+        interpreter.input.target_address(),
+        salt.to_be_bytes().into(),
+    );
+
+    let gas_limit = interpreter.control.gas().remaining_63_of_64_parts();
+    gas!(interpreter, gas_limit);
+
+    // Send container for execution as all deployed containers are preverified to be valid EOF.
+    interpreter.control.set_next_action(
+        InterpreterAction::NewFrame(FrameInput::EOFCreate(Box::new(
+            EOFCreateInputs::new_opcode(
+                interpreter.input.target_address(),
+                created_address,
+                value,
+                eof,
+                gas_limit,
+                CallInput::Bytes(input),
+            ),
+        ))),
+        InstructionResult::CallOrCreate,
+    );
 }
 
 pub fn return_contract<H: Host + ?Sized>(
@@ -167,10 +230,7 @@ pub fn extcall_input(interpreter: &mut Interpreter<impl InterpreterTypes>) -> Op
     }
 
     Some(Bytes::copy_from_slice(
-        interpreter
-            .memory
-            .slice(return_memory_offset.clone())
-            .as_ref(),
+        interpreter.memory.slice(return_memory_offset).as_ref(),
     ))
 }
 
@@ -186,6 +246,7 @@ pub fn extcall_gas_calc<WIRE: InterpreterTypes, H: Host + ?Sized>(
             .set_instruction_result(InstructionResult::FatalExternalError);
         return None;
     };
+
     // account_load.is_empty will be accounted if there is transfer value
     // Berlin can be hardcoded as extcall came after berlin.
     let call_cost = gas::call_cost(
@@ -213,7 +274,7 @@ pub fn extcall_gas_calc<WIRE: InterpreterTypes, H: Host + ?Sized>(
         // Push 1 to stack to indicate that call light failed.
         // It is safe to ignore stack overflow error as we already popped multiple values from stack.
         let _ = interpreter.stack.push(U256::from(1));
-        interpreter.return_data.buffer_mut().clear();
+        interpreter.return_data.clear();
         // Return none to continue execution.
         return None;
     }
@@ -274,7 +335,7 @@ pub fn extcall<WIRE: InterpreterTypes, H: Host + ?Sized>(
     // Call host to interact with target contract
     interpreter.control.set_next_action(
         InterpreterAction::NewFrame(FrameInput::Call(Box::new(CallInputs {
-            input,
+            input: CallInput::Bytes(input),
             gas_limit,
             target_address,
             caller: interpreter.input.target_address(),
@@ -312,7 +373,7 @@ pub fn extdelegatecall<WIRE: InterpreterTypes, H: Host + ?Sized>(
     // Call host to interact with target contract
     interpreter.control.set_next_action(
         InterpreterAction::NewFrame(FrameInput::Call(Box::new(CallInputs {
-            input,
+            input: CallInput::Bytes(input),
             gas_limit,
             target_address: interpreter.input.target_address(),
             caller: interpreter.input.caller_address(),
@@ -350,7 +411,7 @@ pub fn extstaticcall<WIRE: InterpreterTypes, H: Host + ?Sized>(
     // Call host to interact with target contract
     interpreter.control.set_next_action(
         InterpreterAction::NewFrame(FrameInput::Call(Box::new(CallInputs {
-            input,
+            input: CallInput::Bytes(input),
             gas_limit,
             target_address,
             caller: interpreter.input.target_address(),
@@ -388,8 +449,7 @@ pub fn create<WIRE: InterpreterTypes, const IS_CREATE2: bool, H: Host + ?Sized>(
             .is_enabled_in(SpecId::SHANGHAI)
         {
             // Limit is set as double of max contract bytecode size
-            let max_initcode_size = host.cfg().max_code_size().saturating_mul(2);
-            if len > max_initcode_size {
+            if len > host.max_initcode_size() {
                 interpreter
                     .control
                     .set_instruction_result(InstructionResult::CreateInitCodeSizeLimit);
@@ -467,6 +527,7 @@ pub fn call<WIRE: InterpreterTypes, H: Host + ?Sized>(
             .set_instruction_result(InstructionResult::FatalExternalError);
         return;
     };
+
     let Some(mut gas_limit) =
         calc_call_gas(interpreter, account_load, has_transfer, local_gas_limit)
     else {
@@ -483,7 +544,7 @@ pub fn call<WIRE: InterpreterTypes, H: Host + ?Sized>(
     // Call host to interact with target contract
     interpreter.control.set_next_action(
         InterpreterAction::NewFrame(FrameInput::Call(Box::new(CallInputs {
-            input,
+            input: CallInput::SharedBuffer(input),
             gas_limit,
             target_address: to,
             caller: interpreter.input.target_address(),
@@ -518,6 +579,7 @@ pub fn call_code<WIRE: InterpreterTypes, H: Host + ?Sized>(
             .set_instruction_result(InstructionResult::FatalExternalError);
         return;
     };
+
     // Set `is_empty` to false as we are not creating this account.
     load.is_empty = false;
     let Some(mut gas_limit) = calc_call_gas(interpreter, load, !value.is_zero(), local_gas_limit)
@@ -535,7 +597,7 @@ pub fn call_code<WIRE: InterpreterTypes, H: Host + ?Sized>(
     // Call host to interact with target contract
     interpreter.control.set_next_action(
         InterpreterAction::NewFrame(FrameInput::Call(Box::new(CallInputs {
-            input,
+            input: CallInput::SharedBuffer(input),
             gas_limit,
             target_address: interpreter.input.target_address(),
             caller: interpreter.input.target_address(),
@@ -570,6 +632,7 @@ pub fn delegate_call<WIRE: InterpreterTypes, H: Host + ?Sized>(
             .set_instruction_result(InstructionResult::FatalExternalError);
         return;
     };
+
     // Set is_empty to false as we are not creating this account.
     load.is_empty = false;
     let Some(gas_limit) = calc_call_gas(interpreter, load, false, local_gas_limit) else {
@@ -581,7 +644,7 @@ pub fn delegate_call<WIRE: InterpreterTypes, H: Host + ?Sized>(
     // Call host to interact with target contract
     interpreter.control.set_next_action(
         InterpreterAction::NewFrame(FrameInput::Call(Box::new(CallInputs {
-            input,
+            input: CallInput::SharedBuffer(input),
             gas_limit,
             target_address: interpreter.input.target_address(),
             caller: interpreter.input.caller_address(),
@@ -626,7 +689,7 @@ pub fn static_call<WIRE: InterpreterTypes, H: Host + ?Sized>(
     // Call host to interact with target contract
     interpreter.control.set_next_action(
         InterpreterAction::NewFrame(FrameInput::Call(Box::new(CallInputs {
-            input,
+            input: CallInput::SharedBuffer(input),
             gas_limit,
             target_address: to,
             caller: interpreter.input.target_address(),

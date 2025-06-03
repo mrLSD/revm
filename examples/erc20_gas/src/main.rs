@@ -4,22 +4,20 @@
 
 #![cfg_attr(not(test), warn(unused_crate_dependencies))]
 
-use alloy_provider::{network::Ethereum, ProviderBuilder, RootProvider};
+use alloy_provider::{network::Ethereum, DynProvider, Provider, ProviderBuilder};
 use alloy_sol_types::SolValue;
-use alloy_transport_http::Http;
 use anyhow::Result;
-use database::{AlloyDB, BlockId, CacheDB};
 use exec::transact_erc20evm_commit;
-use reqwest::{Client, Url};
 use revm::{
     context_interface::{
         result::{InvalidHeader, InvalidTransaction},
-        ContextTr, Journal,
+        ContextTr, JournalTr,
     },
+    database::{AlloyDB, BlockId, CacheDB},
     database_interface::WrapDatabaseAsync,
-    precompile::PrecompileErrors,
-    primitives::{address, keccak256, Address, Bytes, TxKind, U256},
-    specification::hardfork::SpecId,
+    primitives::{
+        address, hardfork::SpecId, keccak256, Address, StorageValue, TxKind, KECCAK_EMPTY, U256,
+    },
     state::AccountInfo,
     Context, Database, MainBuilder, MainContext,
 };
@@ -27,8 +25,7 @@ use revm::{
 pub mod exec;
 pub mod handler;
 
-type AlloyCacheDB =
-    CacheDB<WrapDatabaseAsync<AlloyDB<Http<Client>, Ethereum, RootProvider<Http<Client>>>>>;
+type AlloyCacheDB = CacheDB<WrapDatabaseAsync<AlloyDB<Ethereum, DynProvider>>>;
 
 // Constants
 pub const TOKEN: Address = address!("a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48");
@@ -36,13 +33,12 @@ pub const TREASURY: Address = address!("0000000000000000000000000000000000000001
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // Set up the HTTP transport which is consumed by the RPC client.
-    let rpc_url: Url = "https://mainnet.infura.io/v3/c60b0bb42f8a4c6481ecd229eddaca27".parse()?;
+    // Initialize the Alloy provider and database
+    let rpc_url = "https://mainnet.infura.io/v3/c60b0bb42f8a4c6481ecd229eddaca27";
+    let provider = ProviderBuilder::new().connect(rpc_url).await?.erased();
 
-    let client = ProviderBuilder::new().on_http(rpc_url);
-
-    let alloy = WrapDatabaseAsync::new(AlloyDB::new(client, BlockId::latest())).unwrap();
-    let mut cache_db = CacheDB::new(alloy);
+    let alloy_db = WrapDatabaseAsync::new(AlloyDB::new(provider, BlockId::latest())).unwrap();
+    let mut cache_db = CacheDB::new(alloy_db);
 
     // Random empty account: From
     let account = address!("18B06aaF27d44B756FCF16Ca20C1f183EB49111f");
@@ -55,14 +51,14 @@ async fn main() -> Result<()> {
     let balance_slot = erc_address_storage(account);
     println!("Balance slot: {balance_slot}");
     cache_db
-        .insert_account_storage(TOKEN, balance_slot, hundred_tokens * U256::from(2))
+        .insert_account_storage(TOKEN, balance_slot, hundred_tokens * StorageValue::from(2))
         .unwrap();
     cache_db.insert_account_info(
         account,
         AccountInfo {
             nonce: 0,
             balance: hundred_tokens * U256::from(2),
-            code_hash: keccak256(Bytes::new()),
+            code_hash: KECCAK_EMPTY,
             code: None,
         },
     );
@@ -89,10 +85,7 @@ pub fn token_operation<CTX, ERROR>(
 ) -> Result<(), ERROR>
 where
     CTX: ContextTr,
-    ERROR: From<InvalidTransaction>
-        + From<InvalidHeader>
-        + From<<CTX::Db as Database>::Error>
-        + From<PrecompileErrors>,
+    ERROR: From<InvalidTransaction> + From<InvalidHeader> + From<<CTX::Db as Database>::Error>,
 {
     let sender_balance_slot = erc_address_storage(sender);
     let sender_balance = context.journal().sload(TOKEN, sender_balance_slot)?.data;
@@ -120,7 +113,7 @@ where
     Ok(())
 }
 
-fn balance_of(address: Address, alloy_db: &mut AlloyCacheDB) -> Result<U256> {
+fn balance_of(address: Address, alloy_db: &mut AlloyCacheDB) -> Result<StorageValue> {
     let slot = erc_address_storage(address);
     alloy_db.storage(TOKEN, slot).map_err(From::from)
 }

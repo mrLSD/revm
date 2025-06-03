@@ -6,8 +6,7 @@ use crate::{
     Host, InstructionResult,
 };
 use core::cmp::min;
-use primitives::{Bytes, Log, LogData, B256, U256};
-use specification::hardfork::SpecId::*;
+use primitives::{hardfork::SpecId::*, Bytes, Log, LogData, B256, BLOCK_HASH_HISTORY, U256};
 
 pub fn balance<WIRE: InterpreterTypes, H: Host + ?Sized>(
     interpreter: &mut Interpreter<WIRE>,
@@ -45,6 +44,7 @@ pub fn selfbalance<WIRE: InterpreterTypes, H: Host + ?Sized>(
 ) {
     check!(interpreter, ISTANBUL);
     gas!(interpreter, gas::LOW);
+
     let Some(balance) = host.balance(interpreter.input.target_address()) else {
         interpreter
             .control
@@ -60,7 +60,7 @@ pub fn extcodesize<WIRE: InterpreterTypes, H: Host + ?Sized>(
 ) {
     popn_top!([], top, interpreter);
     let address = top.into_address();
-    let Some(code) = host.code(address) else {
+    let Some(code) = host.load_account_code(address) else {
         interpreter
             .control
             .set_instruction_result(InstructionResult::FatalExternalError);
@@ -89,7 +89,7 @@ pub fn extcodehash<WIRE: InterpreterTypes, H: Host + ?Sized>(
     check!(interpreter, CONSTANTINOPLE);
     popn_top!([], top, interpreter);
     let address = top.into_address();
-    let Some(code_hash) = host.code_hash(address) else {
+    let Some(code_hash) = host.load_account_code_hash(address) else {
         interpreter
             .control
             .set_instruction_result(InstructionResult::FatalExternalError);
@@ -114,7 +114,7 @@ pub fn extcodecopy<WIRE: InterpreterTypes, H: Host + ?Sized>(
 ) {
     popn!([address, memory_offset, code_offset, len_u256], interpreter);
     let address = address.into_address();
-    let Some(code) = host.code(address) else {
+    let Some(code) = host.load_account_code(address) else {
         interpreter
             .control
             .set_instruction_result(InstructionResult::FatalExternalError);
@@ -146,14 +146,32 @@ pub fn blockhash<WIRE: InterpreterTypes, H: Host + ?Sized>(
     gas!(interpreter, gas::BLOCKHASH);
     popn_top!([], number, interpreter);
 
-    let number_u64 = as_u64_saturated!(number);
-    let Some(hash) = host.block_hash(number_u64) else {
-        interpreter
-            .control
-            .set_instruction_result(InstructionResult::FatalExternalError);
+    let requested_number = as_u64_saturated!(number);
+
+    let block_number = host.block_number();
+
+    let Some(diff) = block_number.checked_sub(requested_number) else {
+        *number = U256::ZERO;
         return;
     };
-    *number = U256::from_be_bytes(hash.0);
+
+    // blockhash should push zero if number is same as current block number.
+    if diff == 0 {
+        *number = U256::ZERO;
+        return;
+    }
+
+    *number = if diff <= BLOCK_HASH_HISTORY {
+        let Some(hash) = host.block_hash(requested_number) else {
+            interpreter
+                .control
+                .set_instruction_result(InstructionResult::FatalExternalError);
+            return;
+        };
+        U256::from_be_bytes(hash.0)
+    } else {
+        U256::ZERO
+    }
 }
 
 pub fn sload<WIRE: InterpreterTypes, H: Host + ?Sized>(
@@ -161,12 +179,14 @@ pub fn sload<WIRE: InterpreterTypes, H: Host + ?Sized>(
     host: &mut H,
 ) {
     popn_top!([], index, interpreter);
+
     let Some(value) = host.sload(interpreter.input.target_address(), *index) else {
         interpreter
             .control
             .set_instruction_result(InstructionResult::FatalExternalError);
         return;
     };
+
     gas!(
         interpreter,
         gas::sload_cost(interpreter.runtime_flag.spec_id(), value.is_cold)
@@ -183,6 +203,7 @@ pub fn sstore<WIRE: InterpreterTypes, H: Host + ?Sized>(
     popn!([index, value], interpreter);
     // TODOFEE
     println!("{index}: {:?}", B256::from(value));
+
     let Some(state_load) = host.sstore(interpreter.input.target_address(), index, value) else {
         interpreter
             .control
@@ -208,10 +229,13 @@ pub fn sstore<WIRE: InterpreterTypes, H: Host + ?Sized>(
         )
     );
 
-    interpreter.control.gas().record_refund(gas::sstore_refund(
-        interpreter.runtime_flag.spec_id(),
-        &state_load.data,
-    ));
+    interpreter
+        .control
+        .gas_mut()
+        .record_refund(gas::sstore_refund(
+            interpreter.runtime_flag.spec_id(),
+            &state_load.data,
+        ));
 }
 
 /// EIP-1153: Transient storage opcodes
@@ -288,6 +312,7 @@ pub fn selfdestruct<WIRE: InterpreterTypes, H: Host + ?Sized>(
     require_non_staticcall!(interpreter);
     popn!([target], interpreter);
     let target = target.into_address();
+
     let Some(res) = host.selfdestruct(interpreter.input.target_address(), target) else {
         interpreter
             .control
@@ -297,7 +322,10 @@ pub fn selfdestruct<WIRE: InterpreterTypes, H: Host + ?Sized>(
 
     // EIP-3529: Reduction in refunds
     if !interpreter.runtime_flag.spec_id().is_enabled_in(LONDON) && !res.previously_destroyed {
-        interpreter.control.gas().record_refund(gas::SELFDESTRUCT)
+        interpreter
+            .control
+            .gas_mut()
+            .record_refund(gas::SELFDESTRUCT)
     }
 
     gas!(

@@ -7,6 +7,113 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0](https://github.com/bluealloy/revm/compare/revm-context-interface-v4.1.0...revm-context-interface-v5.0.0) - 2025-05-22
+
+### Added
+
+- make blob max number optional ([#2532](https://github.com/bluealloy/revm/pull/2532))
+
+### Other
+
+- add TxEnvBuilder::build_fill ([#2536](https://github.com/bluealloy/revm/pull/2536))
+- make crates.io version badge clickable ([#2526](https://github.com/bluealloy/revm/pull/2526))
+- Storage Types Alias ([#2461](https://github.com/bluealloy/revm/pull/2461))
+
+## [4.1.0](https://github.com/bluealloy/revm/compare/revm-context-interface-v4.0.0...revm-context-interface-v4.1.0) - 2025-05-07
+
+Dependency bump
+
+## [4.0.0](https://github.com/bluealloy/revm/compare/revm-context-interface-v3.0.0...revm-context-interface-v4.0.0) - 2025-05-07
+
+### Added
+
+- *(Osaka)* disable EOF ([#2480](https://github.com/bluealloy/revm/pull/2480))
+- skip cloning of call input from shared memory ([#2462](https://github.com/bluealloy/revm/pull/2462))
+- Add a custom address to the CreateScheme. ([#2464](https://github.com/bluealloy/revm/pull/2464))
+- *(Handler)* merge state validation with deduct_caller ([#2460](https://github.com/bluealloy/revm/pull/2460))
+- add chain_ref method to ContextTr trait ([#2450](https://github.com/bluealloy/revm/pull/2450))
+- *(tx)* Add Either RecoveredAuthorization ([#2448](https://github.com/bluealloy/revm/pull/2448))
+- *(EOF)* Changes needed for devnet-1 ([#2377](https://github.com/bluealloy/revm/pull/2377))
+- Move SharedMemory buffer to context ([#2382](https://github.com/bluealloy/revm/pull/2382))
+
+### Other
+
+- copy edit The Book ([#2463](https://github.com/bluealloy/revm/pull/2463))
+- bump dependency version ([#2431](https://github.com/bluealloy/revm/pull/2431))
+- fixed broken link ([#2421](https://github.com/bluealloy/revm/pull/2421))
+
+## [3.0.0](https://github.com/bluealloy/revm/compare/revm-context-interface-v2.0.0...revm-context-interface-v3.0.0) - 2025-04-09
+
+### Fixed
+
+- Effective gas price should check tx type ([#2375](https://github.com/bluealloy/revm/pull/2375))
+
+### Other
+
+- make blob params u64 ([#2385](https://github.com/bluealloy/revm/pull/2385))
+
+## [2.0.0](https://github.com/bluealloy/revm/compare/revm-context-interface-v1.0.0...revm-context-interface-v2.0.0) - 2025-03-28
+
+### Added
+
+- Add JournalInner ([#2311](https://github.com/bluealloy/revm/pull/2311))
+
+## [1.0.0](https://github.com/bluealloy/revm/compare/revm-context-interface-v1.0.0-alpha.5...revm-context-interface-v1.0.0) - 2025-03-24
+
+Stable version
+
+## [1.0.0-alpha.6](https://github.com/bluealloy/revm/compare/revm-context-interface-v1.0.0-alpha.5...revm-context-interface-v1.0.0-alpha.6) - 2025-03-21
+
+### Added
+
+- Remove PrecompileError from PrecompileProvider ([#2233](https://github.com/bluealloy/revm/pull/2233))
+- allow reuse of API for calculating initial tx gas for tx ([#2215](https://github.com/bluealloy/revm/pull/2215))
+
+### Other
+
+- use AccessListItem associated type instead of AccessList ([#2214](https://github.com/bluealloy/revm/pull/2214))
+
+## [1.0.0-alpha.5](https://github.com/bluealloy/revm/compare/revm-context-interface-v1.0.0-alpha.4...revm-context-interface-v1.0.0-alpha.5) - 2025-03-16
+
+### Added
+
+- *(docs)* MyEvm example and book cleanup ([#2218](https://github.com/bluealloy/revm/pull/2218))
+
+## [1.0.0-alpha.4](https://github.com/bluealloy/revm/compare/revm-context-interface-v1.0.0-alpha.3...revm-context-interface-v1.0.0-alpha.4) - 2025-03-12
+
+### Added
+
+- add custom error to context ([#2197](https://github.com/bluealloy/revm/pull/2197))
+- Add tx/block to EvmExecution trait ([#2195](https://github.com/bluealloy/revm/pull/2195))
+
+## [1.0.0-alpha.3](https://github.com/bluealloy/revm/compare/revm-context-interface-v1.0.0-alpha.2...revm-context-interface-v1.0.0-alpha.3) - 2025-03-11
+
+### Fixed
+
+- correct propagate features ([#2177](https://github.com/bluealloy/revm/pull/2177))
+
+### Other
+
+- Add comments to handler methods ([#2188](https://github.com/bluealloy/revm/pull/2188))
+
+## [1.0.0-alpha.2](https://github.com/bluealloy/revm/compare/revm-context-interface-v1.0.0-alpha.1...revm-context-interface-v1.0.0-alpha.2) - 2025-03-10
+
+### Added
+
+- remove specification crate ([#2165](https://github.com/bluealloy/revm/pull/2165))
+- Standalone Host, remove default fn from context ([#2147](https://github.com/bluealloy/revm/pull/2147))
+- implement AccessListTr for Vec ([#2136](https://github.com/bluealloy/revm/pull/2136))
+- allow host to be implemented on custom context ([#2112](https://github.com/bluealloy/revm/pull/2112))
+
+### Other
+
+- JournalTr, JournalOutput, op only using revm crate ([#2155](https://github.com/bluealloy/revm/pull/2155))
+- remove `optional_gas_refund` as unused ([#2132](https://github.com/bluealloy/revm/pull/2132))
+- fix eofcreate error typo ([#2120](https://github.com/bluealloy/revm/pull/2120))
+- Add docs to revm-bytecode crate ([#2108](https://github.com/bluealloy/revm/pull/2108))
+- export eip2930 eip7702 types from one place ([#2097](https://github.com/bluealloy/revm/pull/2097))
+- move all dependencies to workspace ([#2092](https://github.com/bluealloy/revm/pull/2092))
+
 ## [1.0.0-alpha.1](https://github.com/bluealloy/revm/releases/tag/revm-context-interface-v1.0.0-alpha.1) - 2025-02-16
 
 ### Added

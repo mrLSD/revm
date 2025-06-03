@@ -1,8 +1,9 @@
 use super::constants::*;
 use crate::{num_words, tri, SStoreResult, SelfDestructResult, StateLoad};
-use context_interface::journaled_state::AccountLoad;
-use primitives::U256;
-use specification::{eip7702, hardfork::SpecId};
+use context_interface::{
+    journaled_state::AccountLoad, transaction::AccessListItemTr as _, Transaction, TransactionType,
+};
+use primitives::{eip7702, hardfork::SpecId, U256};
 
 /// `SSTORE` opcode refund calculation.
 #[allow(clippy::collapsible_else_if)]
@@ -356,6 +357,17 @@ pub struct InitialAndFloorGas {
     pub floor_gas: u64,
 }
 
+impl InitialAndFloorGas {
+    /// Create a new InitialAndFloorGas instance.
+    #[inline]
+    pub const fn new(initial_gas: u64, floor_gas: u64) -> Self {
+        Self {
+            initial_gas,
+            floor_gas,
+        }
+    }
+}
+
 /// Initial gas that is deducted for transaction to be included.
 /// Initial gas contains initial stipend gas, gas for access list and input data.
 ///
@@ -375,6 +387,13 @@ pub fn calculate_initial_tx_gas(
 
     // Initdate stipend
     let tokens_in_calldata = get_tokens_in_calldata(input, spec_id.is_enabled_in(SpecId::ISTANBUL));
+
+    // TODO(EOF) Tx type is removed
+    // initcode stipend
+    // for initcode in initcodes {
+    //     tokens_in_calldata += get_tokens_in_calldata(initcode.as_ref(), true);
+    // }
+
     gas.initial_gas += tokens_in_calldata * STANDARD_TOKEN_COST;
 
     // Get number of access list account and storages.
@@ -405,10 +424,54 @@ pub fn calculate_initial_tx_gas(
 
         // Calculate gas floor for EIP-7623
         gas.floor_gas = calc_tx_floor_cost(tokens_in_calldata);
-        println!("-- gas.floor_gas: {}"```);
+        println!("-- gas.floor_gas: {}", gas.floor_gas);
     }
 
     gas
+}
+
+/// Initial gas that is deducted for transaction to be included.
+/// Initial gas contains initial stipend gas, gas for access list and input data.
+///
+/// # Returns
+///
+/// - Intrinsic gas
+/// - Number of tokens in calldata
+pub fn calculate_initial_tx_gas_for_tx(tx: impl Transaction, spec: SpecId) -> InitialAndFloorGas {
+    let mut accounts = 0;
+    let mut storages = 0;
+    // legacy is only tx type that does not have access list.
+    if tx.tx_type() != TransactionType::Legacy {
+        (accounts, storages) = tx
+            .access_list()
+            .map(|al| {
+                al.fold((0, 0), |(mut num_accounts, mut num_storage_slots), item| {
+                    num_accounts += 1;
+                    num_storage_slots += item.storage_slots().count();
+
+                    (num_accounts, num_storage_slots)
+                })
+            })
+            .unwrap_or_default();
+    }
+
+    // Access initcodes only if tx is Eip7873.
+    // TODO(EOF) Tx type is removed
+    // let initcodes = if tx.tx_type() == TransactionType::Eip7873 {
+    //     tx.initcodes()
+    // } else {
+    //     &[]
+    // };
+
+    calculate_initial_tx_gas(
+        spec,
+        tx.input(),
+        tx.kind().is_create(),
+        accounts as u64,
+        storages as u64,
+        tx.authorization_list_len() as u64,
+        //initcodes,
+    )
 }
 
 /// Retrieve the total number of tokens in calldata.

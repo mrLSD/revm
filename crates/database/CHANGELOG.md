@@ -7,6 +7,90 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.1](https://github.com/bluealloy/revm/compare/revm-database-v4.0.0...revm-database-v4.0.1) - 2025-05-22
+
+### Other
+
+- bump alloy libs ([#2533](https://github.com/bluealloy/revm/pull/2533))
+- make crates.io version badge clickable ([#2526](https://github.com/bluealloy/revm/pull/2526))
+- Storage Types Alias ([#2461](https://github.com/bluealloy/revm/pull/2461))
+
+
+## [4.0.0](https://github.com/bluealloy/revm/compare/revm-database-v3.1.0...revm-database-v4.0.0) - 2025-05-07
+
+Dependency bump
+
+## [3.1.0](https://github.com/bluealloy/revm/compare/revm-database-v3.0.0...revm-database-v3.1.0) - 2025-05-07
+
+### Added
+
+- *(database)* re-export all public items from alloydb when feature … ([#2443](https://github.com/bluealloy/revm/pull/2443))
+
+### Other
+
+- copy edit The Book ([#2463](https://github.com/bluealloy/revm/pull/2463))
+- bump dependency version ([#2431](https://github.com/bluealloy/revm/pull/2431))
+- fixed broken link ([#2421](https://github.com/bluealloy/revm/pull/2421))
+- remove alloy-sol-types deps ([#2411](https://github.com/bluealloy/revm/pull/2411))
+
+## [3.0.0](https://github.com/bluealloy/revm/compare/revm-database-v2.0.0...revm-database-v3.0.0) - 2025-04-09
+
+### Other
+
+- clean unsed indicatif ([#2379](https://github.com/bluealloy/revm/pull/2379))
+- add 0x prefix to b256! and address! calls ([#2345](https://github.com/bluealloy/revm/pull/2345))
+- *(database)* remove auto_impl dependency ([#2344](https://github.com/bluealloy/revm/pull/2344))
+
+## [2.0.0](https://github.com/bluealloy/revm/compare/revm-database-v1.0.0...revm-database-v2.0.0) - 2025-03-28
+
+### Other
+
+- make number more readable ([#2300](https://github.com/bluealloy/revm/pull/2300))
+
+## [1.0.0](https://github.com/bluealloy/revm/compare/revm-database-v1.0.0-alpha.5...revm-database-v1.0.0) - 2025-03-24
+
+### Other
+
+- docs nits ([#2292](https://github.com/bluealloy/revm/pull/2292))
+
+## [1.0.0-alpha.5](https://github.com/bluealloy/revm/compare/revm-database-v1.0.0-alpha.4...revm-database-v1.0.0-alpha.5) - 2025-03-21
+
+### Other
+
+- make clippy happy ([#2274](https://github.com/bluealloy/revm/pull/2274))
+- simplify single UT for OpSpecId compatibility. ([#2216](https://github.com/bluealloy/revm/pull/2216))
+
+## [1.0.0-alpha.4](https://github.com/bluealloy/revm/compare/revm-database-v1.0.0-alpha.3...revm-database-v1.0.0-alpha.4) - 2025-03-16
+
+### Other
+
+- updated the following local packages: revm-primitives, revm-bytecode
+
+## [1.0.0-alpha.3](https://github.com/bluealloy/revm/compare/revm-database-v1.0.0-alpha.2...revm-database-v1.0.0-alpha.3) - 2025-03-11
+
+### Fixed
+
+- correct propagate features ([#2177](https://github.com/bluealloy/revm/pull/2177))
+
+### Other
+
+- bump alloy ([#2183](https://github.com/bluealloy/revm/pull/2183))
+
+## [1.0.0-alpha.2](https://github.com/bluealloy/revm/compare/revm-database-v1.0.0-alpha.1...revm-database-v1.0.0-alpha.2) - 2025-03-10
+
+### Fixed
+
+- use correct HashMap import ([#2148](https://github.com/bluealloy/revm/pull/2148))
+- *(op)* Handler deposit tx halt, catch_error handle ([#2144](https://github.com/bluealloy/revm/pull/2144))
+
+### Other
+
+- *(db)* separate fields from `CacheDB` into `Cache` ([#2131](https://github.com/bluealloy/revm/pull/2131))
+- PrecompileErrors to PrecompileError ([#2103](https://github.com/bluealloy/revm/pull/2103))
+- *(deps)* bump breaking deps ([#2093](https://github.com/bluealloy/revm/pull/2093))
+- move all dependencies to workspace ([#2092](https://github.com/bluealloy/revm/pull/2092))
+- re-export all crates from `revm` ([#2088](https://github.com/bluealloy/revm/pull/2088))
+
 ## [1.0.0-alpha.1](https://github.com/bluealloy/revm/releases/tag/revm-database-v1.0.0-alpha.1) - 2025-02-16
 
 ### Added

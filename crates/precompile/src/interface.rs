@@ -1,12 +1,13 @@
-use context_interface::result::EVMError;
+//! Interface for the precompiles. It contains the precompile result type,
+//! the precompile output type, and the precompile error type.
 use core::fmt;
 use primitives::Bytes;
-use std::string::{String, ToString};
+use std::string::String;
 
 /// A precompile operation result type
 ///
 /// Returns either `Ok((gas_used, return_bytes))` or `Err(error)`.
-pub type PrecompileResult = Result<PrecompileOutput, PrecompileErrors>;
+pub type PrecompileResult = Result<PrecompileOutput, PrecompileError>;
 
 /// Precompile execution output
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -24,46 +25,31 @@ impl PrecompileOutput {
     }
 }
 
-pub type PrecompileFn = fn(&Bytes, u64) -> PrecompileResult;
+/// Precompile function type. Takes input and gas limit and returns precompile result.
+pub type PrecompileFn = fn(&[u8], u64) -> PrecompileResult;
 
-/// Precompile errors.
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub enum PrecompileErrors {
-    Error(PrecompileError),
-    Fatal { msg: String },
-}
-
-impl<DB, TXERROR> From<PrecompileErrors> for EVMError<DB, TXERROR> {
-    fn from(value: PrecompileErrors) -> Self {
-        Self::Precompile(value.to_string())
-    }
-}
-
-impl core::error::Error for PrecompileErrors {}
-
-impl fmt::Display for PrecompileErrors {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Error(e) => e.fmt(f),
-            Self::Fatal { msg } => f.write_str(msg),
-        }
-    }
-}
-
+/// Precompile error type.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum PrecompileError {
     /// out of gas is the main error. Others are here just for completeness
     OutOfGas,
-    // Blake2 errors
+    /// Blake2 errors
     Blake2WrongLength,
+    /// Blake2 wrong final indicator flag
     Blake2WrongFinalIndicatorFlag,
-    // Modexp errors
+    /// Modexp errors
     ModexpExpOverflow,
+    /// Modexp base overflow
     ModexpBaseOverflow,
+    /// Modexp mod overflow
     ModexpModOverflow,
-    // Bn128 errors
+    /// Modexp limit all input sizes.
+    ModexpEip7823LimitSize,
+    /// Bn128 errors
     Bn128FieldPointNotAMember,
+    /// Bn128 affine g failed to create
     Bn128AffineGFailedToCreate,
+    /// Bn128 pair length
     Bn128PairLength,
     // Blob errors
     /// The input length is not exactly 192 bytes
@@ -72,12 +58,14 @@ pub enum PrecompileError {
     BlobMismatchedVersion,
     /// The proof verification failed
     BlobVerifyKzgProofFailed,
+    /// Fatal error with a custom error message
+    Fatal(String),
     /// Catch-all variant for other errors
     Other(String),
 }
 
 impl PrecompileError {
-    /// Returns an other error with the given message.
+    /// Returns another error with the given message.
     pub fn other(err: impl Into<String>) -> Self {
         Self::Other(err.into())
     }
@@ -85,12 +73,6 @@ impl PrecompileError {
     /// Returns `true` if the error is out of gas.
     pub fn is_oog(&self) -> bool {
         matches!(self, Self::OutOfGas)
-    }
-}
-
-impl From<PrecompileError> for PrecompileErrors {
-    fn from(err: PrecompileError) -> Self {
-        PrecompileErrors::Error(err)
     }
 }
 
@@ -105,12 +87,14 @@ impl fmt::Display for PrecompileError {
             Self::ModexpExpOverflow => "modexp exp overflow",
             Self::ModexpBaseOverflow => "modexp base overflow",
             Self::ModexpModOverflow => "modexp mod overflow",
+            Self::ModexpEip7823LimitSize => "Modexp limit all input sizes.",
             Self::Bn128FieldPointNotAMember => "field point not a member of bn128 curve",
             Self::Bn128AffineGFailedToCreate => "failed to create affine g point for bn128 curve",
             Self::Bn128PairLength => "bn128 invalid pair length",
             Self::BlobInvalidInputLength => "invalid blob input length",
             Self::BlobMismatchedVersion => "mismatched blob version",
             Self::BlobVerifyKzgProofFailed => "verifying blob kzg proof failed",
+            Self::Fatal(s) => s,
             Self::Other(s) => s,
         };
         f.write_str(s)

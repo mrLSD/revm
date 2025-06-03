@@ -9,17 +9,19 @@ use core::convert::Infallible;
 
 use auto_impl::auto_impl;
 use core::error::Error;
-use primitives::{Address, HashMap, B256, U256};
+use primitives::{Address, HashMap, StorageKey, StorageValue, B256};
 use state::{Account, AccountInfo, Bytecode};
 use std::string::String;
 
 #[cfg(feature = "asyncdb")]
 pub mod async_db;
 pub mod empty_db;
+pub mod try_commit;
 
 #[cfg(feature = "asyncdb")]
 pub use async_db::{DatabaseAsync, WrapDatabaseAsync};
 pub use empty_db::{EmptyDB, EmptyDBTyped};
+pub use try_commit::{ArcUpgradeError, TryDatabaseCommit};
 
 /// Database error marker is needed to implement From conversion for Error type.
 pub trait DBErrorMarker {}
@@ -42,7 +44,8 @@ pub trait Database {
     fn code_by_hash(&mut self, code_hash: B256) -> Result<Bytecode, Self::Error>;
 
     /// Gets storage value of address at index.
-    fn storage(&mut self, address: Address, index: U256) -> Result<U256, Self::Error>;
+    fn storage(&mut self, address: Address, index: StorageKey)
+        -> Result<StorageValue, Self::Error>;
 
     /// Gets block hash by block number.
     fn block_hash(&mut self, number: u64) -> Result<B256, Self::Error>;
@@ -73,14 +76,15 @@ pub trait DatabaseRef {
     fn code_by_hash_ref(&self, code_hash: B256) -> Result<Bytecode, Self::Error>;
 
     /// Gets storage value of address at index.
-    fn storage_ref(&self, address: Address, index: U256) -> Result<U256, Self::Error>;
+    fn storage_ref(&self, address: Address, index: StorageKey)
+        -> Result<StorageValue, Self::Error>;
 
     /// Gets block hash by block number.
     fn block_hash_ref(&self, number: u64) -> Result<B256, Self::Error>;
 }
 
 /// Wraps a [`DatabaseRef`] to provide a [`Database`] implementation.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct WrapDatabaseRef<T: DatabaseRef>(pub T);
 
 impl<F: DatabaseRef> From<F> for WrapDatabaseRef<F> {
@@ -104,7 +108,11 @@ impl<T: DatabaseRef> Database for WrapDatabaseRef<T> {
     }
 
     #[inline]
-    fn storage(&mut self, address: Address, index: U256) -> Result<U256, Self::Error> {
+    fn storage(
+        &mut self,
+        address: Address,
+        index: StorageKey,
+    ) -> Result<StorageValue, Self::Error> {
         self.0.storage_ref(address, index)
     }
 

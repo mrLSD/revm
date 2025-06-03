@@ -2,34 +2,29 @@
 #![cfg_attr(not(test), warn(unused_crate_dependencies))]
 
 use alloy_eips::BlockId;
-use alloy_provider::{network::Ethereum, ProviderBuilder, RootProvider};
+use alloy_provider::{network::Ethereum, DynProvider, Provider, ProviderBuilder};
 use alloy_sol_types::{sol, SolCall, SolValue};
-use alloy_transport_http::Http;
 use anyhow::{anyhow, Result};
-use database::{AlloyDB, CacheDB};
-use reqwest::Client;
 use revm::{
     context_interface::result::{ExecutionResult, Output},
+    database::{AlloyDB, CacheDB},
     database_interface::WrapDatabaseAsync,
-    primitives::{address, keccak256, Address, Bytes, TxKind, U256},
+    primitives::{address, keccak256, Address, Bytes, StorageKey, TxKind, KECCAK_EMPTY, U256},
     state::AccountInfo,
     Context, ExecuteCommitEvm, ExecuteEvm, MainBuilder, MainContext,
 };
 use std::ops::Div;
 
-type AlloyCacheDB =
-    CacheDB<WrapDatabaseAsync<AlloyDB<Http<Client>, Ethereum, RootProvider<Http<Client>>>>>;
+type AlloyCacheDB = CacheDB<WrapDatabaseAsync<AlloyDB<Ethereum, DynProvider>>>;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // Set up the HTTP transport which is consumed by the RPC client.
-    let rpc_url = "https://mainnet.infura.io/v3/c60b0bb42f8a4c6481ecd229eddaca27".parse()?;
+    // Initialize the Alloy provider and database
+    let rpc_url = "https://mainnet.infura.io/v3/c60b0bb42f8a4c6481ecd229eddaca27";
+    let provider = ProviderBuilder::new().connect(rpc_url).await?.erased();
 
-    // Create ethers client and wrap it in Arc<M>
-    let client = ProviderBuilder::new().on_http(rpc_url);
-
-    let alloy = WrapDatabaseAsync::new(AlloyDB::new(client, BlockId::latest())).unwrap();
-    let mut cache_db = CacheDB::new(alloy);
+    let alloy_db = WrapDatabaseAsync::new(AlloyDB::new(provider, BlockId::latest())).unwrap();
+    let mut cache_db = CacheDB::new(alloy_db);
 
     // Random empty account
     let account = address!("18B06aaF27d44B756FCF16Ca20C1f183EB49111f");
@@ -38,7 +33,7 @@ async fn main() -> Result<()> {
     let usdc = address!("a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48");
     let usdc_weth_pair = address!("B4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc");
 
-    let weth_balance_slot = U256::from(3);
+    let weth_balance_slot = StorageKey::from(3);
 
     // Give our test account some fake WETH and ETH
     let one_ether = U256::from(1_000_000_000_000_000_000u128);
@@ -50,7 +45,7 @@ async fn main() -> Result<()> {
     let acc_info = AccountInfo {
         nonce: 0_u64,
         balance: one_ether,
-        code_hash: keccak256(Bytes::new()),
+        code_hash: KECCAK_EMPTY,
         code: None,
     };
     cache_db.insert_account_info(account, acc_info);
@@ -107,7 +102,7 @@ fn balance_of(token: Address, address: Address, alloy_db: &mut AlloyCacheDB) -> 
         })
         .build_mainnet();
 
-    let ref_tx = evm.transact_previous().unwrap();
+    let ref_tx = evm.replay().unwrap();
     let result = ref_tx.result;
 
     let value = match result {
@@ -118,7 +113,7 @@ fn balance_of(token: Address, address: Address, alloy_db: &mut AlloyCacheDB) -> 
         result => return Err(anyhow!("'balanceOf' execution failed: {result:?}")),
     };
 
-    let balance = <U256>::abi_decode(&value, false)?;
+    let balance = <U256>::abi_decode(&value)?;
 
     Ok(balance)
 }
@@ -151,7 +146,7 @@ async fn get_amount_out(
         })
         .build_mainnet();
 
-    let ref_tx = evm.transact_previous().unwrap();
+    let ref_tx = evm.replay().unwrap();
     let result = ref_tx.result;
 
     let value = match result {
@@ -162,7 +157,7 @@ async fn get_amount_out(
         result => return Err(anyhow!("'getAmountOut' execution failed: {result:?}")),
     };
 
-    let amount_out = <U256>::abi_decode(&value, false)?;
+    let amount_out = <U256>::abi_decode(&value)?;
 
     Ok(amount_out)
 }
@@ -184,7 +179,7 @@ fn get_reserves(pair_address: Address, cache_db: &mut AlloyCacheDB) -> Result<(U
         })
         .build_mainnet();
 
-    let ref_tx = evm.transact_previous().unwrap();
+    let ref_tx = evm.replay().unwrap();
     let result = ref_tx.result;
 
     let value = match result {
@@ -195,7 +190,7 @@ fn get_reserves(pair_address: Address, cache_db: &mut AlloyCacheDB) -> Result<(U
         result => return Err(anyhow!("'getReserves' execution failed: {result:?}")),
     };
 
-    let (reserve0, reserve1, _) = <(U256, U256, u32)>::abi_decode(&value, false)?;
+    let (reserve0, reserve1, _) = <(U256, U256, u32)>::abi_decode(&value)?;
 
     Ok((reserve0, reserve1))
 }
@@ -234,7 +229,7 @@ fn swap(
         })
         .build_mainnet();
 
-    let ref_tx = evm.transact_commit_previous().unwrap();
+    let ref_tx = evm.replay_commit().unwrap();
 
     match ref_tx {
         ExecutionResult::Success { .. } => {}
@@ -267,12 +262,12 @@ fn transfer(
         })
         .build_mainnet();
 
-    let ref_tx = evm.transact_commit_previous().unwrap();
+    let ref_tx = evm.replay_commit().unwrap();
     let success: bool = match ref_tx {
         ExecutionResult::Success {
             output: Output::Call(value),
             ..
-        } => <bool>::abi_decode(&value, false)?,
+        } => <bool>::abi_decode(&value)?,
         result => return Err(anyhow!("'transfer' execution failed: {result:?}")),
     };
 

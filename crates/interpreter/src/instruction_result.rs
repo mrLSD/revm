@@ -94,7 +94,7 @@ pub enum InstructionResult {
     SubRoutineStackOverflow,
     /// Aux data overflow, new aux data is larger than `u16` max size.
     EofAuxDataOverflow,
-    /// Aux data is smaller then already present data size.
+    /// Aux data is smaller than already present data size.
     EofAuxDataTooSmall,
     /// `EXT*CALL` target address needs to be padded with 0s.
     InvalidEXTCALLTarget,
@@ -109,8 +109,6 @@ impl From<TransferError> for InstructionResult {
         }
     }
 }
-
-impl InstructionResult {}
 
 impl From<SuccessReason> for InstructionResult {
     fn from(value: SuccessReason) -> Self {
@@ -248,7 +246,7 @@ impl InstructionResult {
     }
 }
 
-/// Internal result that are not ex
+/// Internal results that are not exposed externally
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum InternalResult {
     /// Internal instruction that signals Interpreter should continue running.

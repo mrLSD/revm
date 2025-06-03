@@ -7,24 +7,25 @@ mod shared_memory;
 mod stack;
 mod subroutine_stack;
 
-use crate::{
-    interpreter_types::*,
-    table::{CustomInstruction, InstructionTable},
-    Gas, Host, Instruction, InstructionResult, InterpreterAction,
-};
-use core::cell::RefCell;
+// re-exports
 pub use ext_bytecode::ExtBytecode;
 pub use input::InputsImpl;
-use loop_control::LoopControl as LoopControlImpl;
-use primitives::Bytes;
-use return_data::ReturnDataImpl;
+pub use loop_control::LoopControl as LoopControlImpl;
+pub use return_data::ReturnDataImpl;
 pub use runtime_flags::RuntimeFlags;
-pub use shared_memory::{num_words, MemoryGetter, SharedMemory, EMPTY_SHARED_MEMORY};
-use specification::hardfork::SpecId;
+pub use shared_memory::{num_words, SharedMemory};
 pub use stack::{Stack, STACK_LIMIT};
-use std::rc::Rc;
-use subroutine_stack::SubRoutineImpl;
+pub use subroutine_stack::{SubRoutineImpl, SubRoutineReturnFrame};
 
+// imports
+use crate::{
+    interpreter_types::*, CallInput, Gas, Host, Instruction, InstructionResult, InstructionTable,
+    InterpreterAction,
+};
+use bytecode::Bytecode;
+use primitives::{hardfork::SpecId, Address, Bytes, U256};
+
+/// Main interpreter structure that contains all components defines in [`InterpreterTypes`].s
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(::serde::Serialize, ::serde::Deserialize))]
 pub struct Interpreter<WIRE: InterpreterTypes = EthInterpreter> {
@@ -39,10 +40,10 @@ pub struct Interpreter<WIRE: InterpreterTypes = EthInterpreter> {
     pub extend: WIRE::Extend,
 }
 
-impl<EXT: Default, MG: MemoryGetter> Interpreter<EthInterpreter<EXT, MG>> {
+impl<EXT: Default> Interpreter<EthInterpreter<EXT>> {
     /// Create new interpreter
     pub fn new(
-        memory: Rc<RefCell<MG>>,
+        memory: SharedMemory,
         bytecode: ExtBytecode,
         inputs: InputsImpl,
         is_static: bool,
@@ -69,15 +70,42 @@ impl<EXT: Default, MG: MemoryGetter> Interpreter<EthInterpreter<EXT, MG>> {
             extend: EXT::default(),
         }
     }
+
+    /// Sets the bytecode that is going to be executed
+    pub fn with_bytecode(mut self, bytecode: Bytecode) -> Self {
+        self.bytecode = ExtBytecode::new(bytecode);
+        self
+    }
 }
 
+impl Default for Interpreter<EthInterpreter> {
+    fn default() -> Self {
+        Interpreter::new(
+            SharedMemory::new(),
+            ExtBytecode::new(Bytecode::default()),
+            InputsImpl {
+                target_address: Address::ZERO,
+                bytecode_address: None,
+                caller_address: Address::ZERO,
+                input: CallInput::default(),
+                call_value: U256::ZERO,
+            },
+            false,
+            false,
+            SpecId::default(),
+            u64::MAX,
+        )
+    }
+}
+
+/// Default types for Ethereum interpreter.
 pub struct EthInterpreter<EXT = (), MG = SharedMemory> {
     _phantom: core::marker::PhantomData<fn() -> (EXT, MG)>,
 }
 
-impl<EXT, MG: MemoryGetter> InterpreterTypes for EthInterpreter<EXT, MG> {
+impl<EXT> InterpreterTypes for EthInterpreter<EXT> {
     type Stack = Stack;
-    type Memory = Rc<RefCell<MG>>;
+    type Memory = SharedMemory;
     type Bytecode = ExtBytecode;
     type ReturnData = ReturnDataImpl;
     type Input = InputsImpl;
@@ -85,21 +113,7 @@ impl<EXT, MG: MemoryGetter> InterpreterTypes for EthInterpreter<EXT, MG> {
     type Control = LoopControlImpl;
     type RuntimeFlag = RuntimeFlags;
     type Extend = EXT;
-}
-
-impl<IW: InterpreterTypes, H: Host> CustomInstruction for Instruction<IW, H> {
-    type Wire = IW;
-    type Host = H;
-
-    #[inline]
-    fn exec(&self, interpreter: &mut Interpreter<Self::Wire>, host: &mut Self::Host) {
-        (self)(interpreter, host);
-    }
-
-    #[inline]
-    fn from_base(instruction: Instruction<Self::Wire, Self::Host>) -> Self {
-        instruction
-    }
+    type Output = InterpreterAction;
 }
 
 impl<IW: InterpreterTypes> Interpreter<IW> {
@@ -107,7 +121,7 @@ impl<IW: InterpreterTypes> Interpreter<IW> {
     ///
     /// Internally it will increment instruction pointer by one.
     #[inline]
-    pub(crate) fn step<H: Host>(
+    pub(crate) fn step<H: Host + ?Sized>(
         &mut self,
         instruction_table: &[Instruction<IW, H>; 256],
         host: &mut H,
@@ -116,7 +130,7 @@ impl<IW: InterpreterTypes> Interpreter<IW> {
         let opcode = self.bytecode.opcode();
 
         // TODOFEE
-        println!("OPCODE({})", bytecode::opcode::OpCode::new(opcode).unwrap());
+        println!("OPCODE({:?})", bytecode::opcode::OpCode::new(opcode));
 
         // SAFETY: In analysis we are doing padding of bytecode so that we are sure that last
         // byte instruction is STOP so we are safe to just increment program_counter bcs on last instruction
@@ -124,19 +138,22 @@ impl<IW: InterpreterTypes> Interpreter<IW> {
         self.bytecode.relative_jump(1);
 
         // Execute instruction.
-        instruction_table[opcode as usize].exec(self, host)
+        instruction_table[opcode as usize](self, host)
     }
 
+    /// Resets the control to the initial state. so that we can run the interpreter again.
     #[inline]
     pub fn reset_control(&mut self) {
         self.control
             .set_next_action(InterpreterAction::None, InstructionResult::Continue);
     }
 
+    /// Takes the next action from the control and returns it.
+    #[inline]
     pub fn take_next_action(&mut self) -> InterpreterAction {
         // Return next action if it is some.
         let action = self.control.take_next_action();
-        if action.is_some() {
+        if action != InterpreterAction::None {
             return action;
         }
         // If not, return action without output as it is a halt.
@@ -151,7 +168,8 @@ impl<IW: InterpreterTypes> Interpreter<IW> {
     }
 
     /// Executes the interpreter until it returns or stops.
-    pub fn run_plain<H: Host>(
+    #[inline]
+    pub fn run_plain<H: Host + ?Sized>(
         &mut self,
         instruction_table: &InstructionTable<IW, H>,
         host: &mut H,
@@ -208,28 +226,51 @@ impl InterpreterResult {
     }
 }
 
+// Special implementation for types where Output can be created from InterpreterAction
+impl<IW: InterpreterTypes> Interpreter<IW>
+where
+    IW::Output: From<InterpreterAction>,
+{
+    /// Takes the next action from the control and returns it as the specific Output type.
+    #[inline]
+    pub fn take_next_action_as_output(&mut self) -> IW::Output {
+        From::from(self.take_next_action())
+    }
+
+    /// Executes the interpreter until it returns or stops, returning the specific Output type.
+    #[inline]
+    pub fn run_plain_as_output<H: Host + ?Sized>(
+        &mut self,
+        instruction_table: &InstructionTable<IW, H>,
+        host: &mut H,
+    ) -> IW::Output {
+        From::from(self.run_plain(instruction_table, host))
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use bytecode::Bytecode;
-    use primitives::{Address, Bytes, U256};
-
     #[test]
     #[cfg(feature = "serde")]
     fn test_interpreter_serde() {
+        use super::*;
+        use bytecode::Bytecode;
+        use primitives::{Address, Bytes, U256};
+
         let bytecode = Bytecode::new_raw(Bytes::from(&[0x60, 0x00, 0x60, 0x00, 0x01][..]));
         let interpreter = Interpreter::<EthInterpreter>::new(
-            Rc::new(RefCell::new(SharedMemory::new())),
+            SharedMemory::new(),
             ExtBytecode::new(bytecode),
             InputsImpl {
                 target_address: Address::ZERO,
                 caller_address: Address::ZERO,
-                input: Bytes::default(),
+                bytecode_address: None,
+                input: CallInput::Bytes(Bytes::default()),
                 call_value: U256::ZERO,
             },
             false,
             false,
-            SpecId::LATEST,
+            SpecId::default(),
             u64::MAX,
         );
 
